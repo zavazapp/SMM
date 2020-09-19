@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,7 +18,7 @@ import utils.FileUtils;
 /**
  * Data Access Object class. Collects files from the source.
  *
- * @author Miodrag Spasic
+ * @author Miodrag Spasic.
  */
 public class MTDAO {
 

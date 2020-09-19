@@ -60,6 +60,7 @@ import utils.FileUtils;
 
 public class MasterControler implements Initializable, ListChangeListener<MTEntity> {
 
+    public static boolean CHANGING_FILE_NAME_ONLY;
     private DisplayDataModel d;
     private preferences.MasterPreferences preferences;
     private final MTDAO mtdao = new MTDAO();
@@ -407,7 +408,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
 
     @FXML
     private void onRenameClicked() {
-        DirectoryWatcher.CHANGING_FILE_NAME_ONLY = true; //custom handling of avoidance to notification display on rename
+        CHANGING_FILE_NAME_ONLY = true; //custom handling of avoidance to notification display on rename
         ObservableList<Integer> selectedIndices = table.getSelectionModel().getSelectedIndices();
         int counter = 0; //number of renamed files - adds if fileRename methods return true or !=null
 
@@ -449,7 +450,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                 Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        DirectoryWatcher.CHANGING_FILE_NAME_ONLY = false;
+        CHANGING_FILE_NAME_ONLY = false;
         scene.setCursor(Cursor.DEFAULT);
 
         //inform user about action completion

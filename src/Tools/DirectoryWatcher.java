@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
+import static controlers.MasterControler.CHANGING_FILE_NAME_ONLY;
 
 /**
  * This class sets watchers on directories that are checked in settings to
@@ -28,7 +29,6 @@ import javafx.application.Platform;
 public class DirectoryWatcher implements Runnable {
 
     public static WatchService watcher;
-    public static boolean CHANGING_FILE_NAME_ONLY;
     private final Map<WatchKey, Path> keys;
     private ArrayList<Path> dirs;
     static Path filename;
@@ -98,7 +98,7 @@ public class DirectoryWatcher implements Runnable {
                 //use CHANGING_FILE_NAME_ONLY variable to avoid notification on file rename
                 if (kind == StandardWatchEventKinds.ENTRY_CREATE
                         && filename.getFileName().toString().endsWith(".pdf")) {
-                    if (!DirectoryWatcher.CHANGING_FILE_NAME_ONLY) {
+                    if (!CHANGING_FILE_NAME_ONLY) {
                     System.out.println(filename);
                     Platform.runLater(new Runnable() {
                         @Override
