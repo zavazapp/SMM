@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="scene" maxWidth="1.7976931348623157E308" prefHeight="235.0" prefWidth="985.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.MasterControler">
+    <children>
+        <MenuBar>
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem id="close" mnemonicParsing="false" onAction="#onMenuClick" text="Close" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Tools">
+                    <items>
+                        <MenuItem id="merge_pdf" mnemonicParsing="false" onAction="#onMenuClick" text="Merge PDFs" />
+                        <MenuItem id="settings" mnemonicParsing="false" onAction="#onMenuClick" text="Settings" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="View">
+                    <items>
+                        <MenuItem id="tbo" mnemonicParsing="false" onAction="#onMenuClick" text="TBO" />
+                        <MenuItem id="ppi" mnemonicParsing="false" onAction="#onMenuClick" text="PPI" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem id="live" fx:id="menuItemLive" mnemonicParsing="false" onAction="#onMenuClick" text="Live" />
+                        <MenuItem id="archive" fx:id="menuItemArchive" mnemonicParsing="false" onAction="#onMenuClick" text="Archive" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <HBox fx:id="headerHBox" alignment="TOP_CENTER" prefHeight="110.0" prefWidth="876.0">
+            <children>
+                <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="120.0" styleClass="ppiDark" HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                    </HBox.margin>
+                    <children>
+                        <Label fx:id="liveLabel" alignment="CENTER" layoutX="10.0" layoutY="25.0" prefHeight="68.0" prefWidth="134.0" rotate="-38.7" text="Live" textAlignment="CENTER" textFill="#68beff">
+                            <font>
+                                <Font name="System Bold" size="29.0" />
+                            </font>
+                            <effect>
+                                <Glow level="0.92" />
+                            </effect>
+                        </Label>
+                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="88.0" prefWidth="103.0" text="PPI" textAlignment="CENTER" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="48.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </Pane>
+                <AnchorPane opacity="0.9" styleClass="ppiDark">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="156.0">
+                            <children>
+                                <Label text="Messages:" textFill="WHITE">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <Label fx:id="masterCount" alignment="CENTER" text="0" textAlignment="CENTER" textFill="WHITE">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                    <HBox.margin>
+                                        <Insets left="8.0" />
+                                    </HBox.margin>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <Label id="completeLabel" fx:id="completeLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="109.0" layoutY="2.0" text="✓" textFill="#68beffbf" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <font>
+                                <Font size="48.0" />
+                            </font>
+                            <effect>
+                                <Glow level="1.0" />
+                            </effect>
+                        </Label>
+                    </children>
+                    <padding>
+                        <Insets bottom="4.0" top="4.0" />
+                    </padding>
+                    <HBox.margin>
+                        <Insets bottom="4.0" top="4.0" />
+                    </HBox.margin>
+                </AnchorPane>
+                <AnchorPane styleClass="ppiDark" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label alignment="CENTER" cache="true" cacheHint="SPEED" contentDisplay="CENTER" layoutX="135.0" layoutY="1.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="300.0" opacity="0.8" text="Swift messages management" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <padding>
+                                <Insets left="32.0" />
+                            </padding>
+                        </Label>
+                        <Label alignment="BOTTOM_RIGHT" cache="true" cacheHint="SPEED" contentDisplay="RIGHT" opacity="0.8" text="© by Miodrag Spasić" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                            <padding>
+                                <Insets right="16.0" />
+                            </padding>
+                        </Label>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="4.0" top="4.0" />
+                    </HBox.margin>
+                </AnchorPane>
+                <Pane layoutX="210.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="150.0" styleClass="ppiDark" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets right="4.0" top="4.0" />
+                    </padding>
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                    </HBox.margin>
+                    <children>
+                        <ImageView layoutX="28.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../resources/Transfer-files2.png" />
+                            </image>
+                            <viewport>
+                                <Rectangle2D />
+                            </viewport>
+                        </ImageView>
+                    </children>
+                </Pane>
+            </children>
+        </HBox>
+        <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox fx:id="navHBox" minWidth="-Infinity" prefWidth="120.0" styleClass="ppiDark" HBox.hgrow="NEVER">
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" />
+                    </HBox.margin>
+                    <children>
+                        <Label fx:id="lastSelectionDisplay" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="127.0" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                            <effect>
+                                <Glow level="0.99" />
+                            </effect>
+                        </Label>
+                        <AnchorPane prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight" VBox.vgrow="NEVER">
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" top="6.0" />
+                            </VBox.margin>
+                            <children>
+                                <Label alignment="CENTER" text="MT 192" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT192I" fx:id="MasterControler" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT192O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </AnchorPane>
+                        <AnchorPane layoutX="18.0" layoutY="36.0" prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight">
+                            <children>
+                                <Label alignment="CENTER" text="MT 195" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT195I" fx:id="MasterControler1" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT195O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" />
+                            </VBox.margin>
+                        </AnchorPane>
+                        <AnchorPane layoutX="18.0" layoutY="85.0" prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight">
+                            <children>
+                                <Label alignment="CENTER" text="MT 196" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT196I" fx:id="MasterControler11" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT196O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" />
+                            </VBox.margin>
+                        </AnchorPane>
+                        <AnchorPane layoutX="18.0" layoutY="134.0" prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight">
+                            <children>
+                                <Label alignment="CENTER" text="MT 199" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT199I" fx:id="MasterControler111" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT199O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" />
+                            </VBox.margin>
+                        </AnchorPane>
+                        <AnchorPane layoutX="10.0" layoutY="183.0" prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight">
+                            <children>
+                                <Label alignment="CENTER" text="MT 202" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT202I" fx:id="MasterControler1111" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT202O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" />
+                            </VBox.margin>
+                        </AnchorPane>
+                        <AnchorPane layoutX="10.0" layoutY="224.0" prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight">
+                            <children>
+                                <Label alignment="CENTER" text="MT 299" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT299I" fx:id="MasterControler11111" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT299O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" />
+                            </VBox.margin>
+                        </AnchorPane>
+                        <AnchorPane layoutX="10.0" layoutY="265.0" prefHeight="30.0" prefWidth="134.0" styleClass="ppiLight">
+                            <children>
+                                <Label alignment="CENTER" text="MT 999" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                    </padding>
+                                </Label>
+                                <HBox alignment="CENTER" layoutY="17.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="17.0" prefWidth="134.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label id="MT999I" fx:id="MasterControler111111" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Sent" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                        <Label id="MT999O" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" onMouseClicked="#onNavMenuClicked" styleClass="navLabel" stylesheets="@../resources/smm_stylesheet.css" text="Rec" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="4.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <VBox.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" />
+                            </VBox.margin>
+                        </AnchorPane>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets left="4.0" right="4.0" />
+                    </HBox.margin>
+                    <children>
+                        <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn editable="false" maxWidth="120.0" minWidth="70.0" prefWidth="70.0" text="Sender">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="sender" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn editable="false" maxWidth="120.0" minWidth="70.0" prefWidth="70.0" text="Bene">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="bene" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="-1.0" text="F20">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="field20" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="-1.0" text="F21">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="field21" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn editable="false" maxWidth="100.0" minWidth="70.0" prefWidth="70.0" styleClass="center" text="Value Date">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="valueDate" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn editable="false" maxWidth="100.0" minWidth="70.0" prefWidth="70.0" text="Currency">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="currency" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="113.0" text="Amount">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="amount" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="dateReceived" editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="-1.0" text="Received Date">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="dateReceived" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                            </columns>
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+       
+                                </FXCollections>
+                            </items>
+                            <sortOrder>
+                                <fx:reference source="dateReceived" />
+                            </sortOrder>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy> 
+                        </TableView>
+                    </children>
+                </VBox>
+                <VBox alignment="TOP_CENTER" layoutX="110.0" layoutY="10.0" prefHeight="200.0" prefWidth="150.0" HBox.hgrow="NEVER">
+                    <HBox.margin>
+                        <Insets right="4.0" top="4.0" />
+                    </HBox.margin>
+                    <children>
+                        <DatePicker fx:id="datePicker" editable="false" minWidth="-Infinity" prefWidth="150.0" />
+                  <Button fx:id="renameButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#onRenameClicked" text="Rename">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="archiveButton" mnemonicParsing="false" onMouseClicked="#onArchiveClick" text="Archive">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button id="pension" fx:id="pensionButon" mnemonicParsing="false" onMouseClicked="#onArchiveClick" text="Pension">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button id="TBO" mnemonicParsing="false" onMouseClicked="#onSendClick" text="Send to TBO">
+                     <VBox.margin>
+                        <Insets top="128.0" />
+                     </VBox.margin>
+                  </Button>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+    <stylesheets>
+        <URL value="@../resources/smm_stylesheet.css" />
+    </stylesheets>
+</VBox>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="anchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="800.0" styleClass="notification" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.NotificationController">
+    <stylesheets>
+        <URL value="@/resources/smm_stylesheet.css" />
+    </stylesheets>
+   <children>
+      <TableView fx:id="table" layoutX="10.0" layoutY="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0">
+         <columns>
+            <TableColumn id="type" editable="false" maxWidth="120.0" minWidth="70.0" prefWidth="70.0" text="Type">
+               <cellValueFactory>
+                  <PropertyValueFactory property="type" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="sender" editable="false" maxWidth="120.0" minWidth="70.0" prefWidth="70.0" text="Sender">
+               <cellValueFactory>
+                  <PropertyValueFactory property="sender" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="field20" editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="-1.0" text="F20">
+               <cellValueFactory>
+                  <PropertyValueFactory property="field20" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="field21" editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="-1.0" text="F21">
+               <cellValueFactory>
+                  <PropertyValueFactory property="field21" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="valueDate" editable="false" maxWidth="100.0" minWidth="70.0" prefWidth="70.0" styleClass="center" text="Value Date">
+               <cellValueFactory>
+                  <PropertyValueFactory property="valueDate" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="currency" editable="false" maxWidth="100.0" minWidth="70.0" prefWidth="70.0" text="Currency">
+               <cellValueFactory>
+                  <PropertyValueFactory property="currency" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="amount" editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="113.0" text="Amount">
+               <cellValueFactory>
+                  <PropertyValueFactory property="amount" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn id="dateReceived" editable="false" maxWidth="500.0" minWidth="70.0" prefWidth="-1.0" text="Received Date">
+               <cellValueFactory>
+                  <PropertyValueFactory property="dateReceived" />
+               </cellValueFactory>
+            </TableColumn>
+         </columns>
+         <items>
+            <FXCollections fx:factory="observableArrayList" />
+         </items>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <Label layoutX="782.0" layoutY="6.0" onMouseClicked="#onCloseClick" prefHeight="17.0" prefWidth="10.0" text="X" textFill="RED" AnchorPane.bottomAnchor="179.0" AnchorPane.leftAnchor="782.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="4.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

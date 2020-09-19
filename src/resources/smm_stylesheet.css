@@ -1,0 +1,20 @@
+.navLabel:hover {
+    -fx-text-fill: #00ff7f;
+    -fx-cursor: hand;
+}
+
+.tboDark {
+    -fx-background-color: #512B58;
+}
+
+.tboLight{
+    -fx-background-color: #BA68C8;
+}
+
+.ppiDark {
+    -fx-background-color: #502DCE;
+}
+
+.ppiLight{
+    -fx-background-color: #5050C8;
+}
