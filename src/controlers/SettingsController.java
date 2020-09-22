@@ -117,6 +117,7 @@ public class SettingsController implements Initializable {
      ((Stage) title.getScene().getWindow()).close();
     }
 
+    //Settings item model
     public class SettingsItem {
 
         private SimpleStringProperty name;

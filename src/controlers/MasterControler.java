@@ -164,6 +164,9 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             case "ppi":
                 loadScene(e.getId());
                 break;
+            case "t1":
+                loadScene(e.getId());
+                break;
             case "live":
                 d.setLive(true);
                 datePicker.setValue(LocalDate.now());
@@ -342,8 +345,9 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                 loader = new FXMLLoader(MasterControler.class.getResource("/FXMLFiles/Settings.fxml"));
                 stage = new Stage();
                 break;
-            case "notification":
-                
+            case "t1":
+                loader = new FXMLLoader(MasterControler.class.getResource("/FXMLFiles/T1.fxml"));
+                stage = new Stage();
                 break;
         }
 
@@ -665,7 +669,10 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             protected Object call() throws Exception {
                 ArrayList<Path> dirs = new ArrayList<>();
                 for (int i = 0; i < preferences.getFOLDERS().length; i++) {
-                    dirs.add(preferences.getSpecificForder(i));
+                    if (preferences.getSpecificForder(i).toFile().exists()) {
+                        dirs.add(preferences.getSpecificForder(i));
+                    }
+                    
                 }
 
                 DirectoryWatcher watcher = new DirectoryWatcher(dirs);

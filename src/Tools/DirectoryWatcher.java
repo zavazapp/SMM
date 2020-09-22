@@ -52,7 +52,7 @@ public class DirectoryWatcher implements Runnable {
                 Logger.getLogger(DirectoryWatcher.class.getName()).log(Level.SEVERE, null, ex);
                 continue;
             }
-            if (key != null && !path.toString().isEmpty()) {
+            if (key != null && !path.toString().isEmpty()  && path.toFile().exists()) {
                 keys.put(key, path);
             }
             

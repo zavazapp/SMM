@@ -42,6 +42,7 @@
                     <items>
                         <MenuItem id="tbo" mnemonicParsing="false" onAction="#onMenuClick" text="TBO" />
                         <MenuItem id="ppi" mnemonicParsing="false" onAction="#onMenuClick" text="PPI" />
+                  <MenuItem id="t1" mnemonicParsing="false" onAction="#onMenuClick" text="T1" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem id="live" fx:id="menuItemLive" mnemonicParsing="false" onAction="#onMenuClick" text="Live" />
                         <MenuItem id="archive" fx:id="menuItemArchive" mnemonicParsing="false" onAction="#onMenuClick" text="Archive" />
