@@ -3,6 +3,7 @@ package controlers;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -57,10 +58,11 @@ public class LoginController implements Initializable {
         MODE = "PPI";
         deptLabel.setText(MODE);
         versionLabel.setText("Ver. " + VERSION);
-        String email = System.getProperty("user.name") != null ? System.getProperty("user.name") : "";
-        userEmailLabel.setText(email != null ? email.concat("@aikbanka.rs") : "Unknown user");
 
-        NAME = utils.StringUtils.getNameFromUser(email);
+//        String email = System.getProperty("user.name") != null ? System.getProperty("user.name") : "";
+//        userEmailLabel.setText(email != null ? email.concat("@aikbanka.rs") : "Unknown user");
+//
+//        NAME = utils.StringUtils.getNameFromUser(email);
         setMode(null);
     }
 
@@ -70,12 +72,16 @@ public class LoginController implements Initializable {
      * @param evt
      */
     public void setMode(MouseEvent evt) {
+
         if (evt != null) {
             button = (Button) evt.getSource();
             MODE = button.getText();
             preferences.PPIPreferences.getInstance(getClass()).setLastMode();
         } else {
             MODE = preferences.PPIPreferences.getInstance(getClass()).getLastMode();
+        }
+        if (MODE == null) {
+            MODE = "PPI";
         }
 
         switch (MODE) {
@@ -98,7 +104,7 @@ public class LoginController implements Initializable {
         if (passField.getText().equals(MODE.toLowerCase())) {
             loadScene();
         } else {
-            
+
             alert.showAndWait();
             passField.setText("");
             passField.requestFocus();
@@ -110,7 +116,7 @@ public class LoginController implements Initializable {
             if (alert == null) {
                 alert = AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Login error!", "Wrong password!", "Try again.");
             }
-            
+
             if (!alert.isShowing()) {
                 login();
             }
@@ -118,13 +124,11 @@ public class LoginController implements Initializable {
     }
 
     public void loadScene() throws IOException {
-        Stage stage = (Stage) rightHalfPane.getScene().getWindow();
-        
+
         FXMLLoader loader = null;
         switch (MODE) {
             case "PPI":
                 loader = new FXMLLoader(getClass().getResource("/FXMLFiles/PPI.fxml"));
-
                 break;
             case "TBO":
                 loader = new FXMLLoader(getClass().getResource("/FXMLFiles/TBO.fxml"));
@@ -132,10 +136,11 @@ public class LoginController implements Initializable {
         }
 
         if (loader != null) {
-
-            Scene scene = new Scene(loader.load());
-            stage.setScene(scene);
-            stage.show();
+            Stage stage = (Stage) rightHalfPane.getScene().getWindow();
+            stage.setScene(new Scene(loader.load()));
+            Platform.runLater(() -> {
+                stage.show();
+            });
         }
     }
 }

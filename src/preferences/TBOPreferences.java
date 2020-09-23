@@ -19,10 +19,10 @@ public class TBOPreferences extends MasterPreferences {
 
     private static TBOPreferences tboPreferences;
     //default folders
-//    private final String TBO_ROOT = "\\\\sftp\\tbo";
-    private final String TBO_ROOT = "C:\\Users\\Korisnik\\Desktop\\MT_TBO";
-//    private final String PPI_DIR = "\\\\sftp\\PPI\\MT_SWIFT";
-    private final String PPI_DIR = "C:\\Users\\Korisnik\\Desktop\\MT_PPI\\MT_SWIFT";
+    private final String TBO_ROOT = "\\\\sftp\\tbo";
+    // private final String TBO_ROOT = "C:\\Users\\Korisnik\\Desktop\\MT_TBO";
+    private final String PPI_DIR = "\\\\sftp\\PPI\\MT_SWIFT";
+    // private final String PPI_DIR = "C:\\Users\\Korisnik\\Desktop\\MT_PPI\\MT_SWIFT";
     //folders available in navigation menu
     public final List<String> AVAILABLE_PPI_FOLDERS = Arrays.asList("MT202O", "MT202I", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O");
     private final String[] TBO_FOLDERS = new String[]{"MT200I", "MT200O", "MT202I", "MT202O", "MT300I", "MT300O", "MT320I", "MT320O", "MT950I", "MT950O", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O", "TIKETI"};
@@ -119,6 +119,16 @@ public class TBOPreferences extends MasterPreferences {
     @Override
     public String[] getFOLDERS() {
         return TBO_FOLDERS;
+    }
+
+    @Override
+    public boolean getObserverStatus() {
+        return preferences.getBoolean("observer_status", false);
+    }
+
+    @Override
+    public void setObserverStatus(boolean status) {
+        preferences.putBoolean("observer_status", status);
     }
 
     //on ResetToDefault click impl.

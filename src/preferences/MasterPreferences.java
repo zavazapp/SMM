@@ -58,4 +58,11 @@ public class MasterPreferences {
     
     public void setLastOppenedDir(String lastOppened) {
     }
+    
+    public boolean getObserverStatus(){
+        return false;
+    }
+    
+    public void setObserverStatus(boolean status){
+    }
 }

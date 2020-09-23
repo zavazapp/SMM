@@ -1,25 +1,32 @@
 package controlers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
-import javax.swing.event.ChangeEvent;
-import models.MTMessages.MTEntity;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import preferences.TBOPreferences;
+import utils.AlertUtils;
 
 /**
  * FXML Controller class
@@ -34,7 +41,8 @@ public class T1Controller implements Initializable {
     private ObservableList<T1Item> tempDataSent;
     private ObservableList<T1Item> finalData;
     private String[] availableFolders;
-    private static HashMap<String, TableView> tables;
+    private HashMap<String, TableView> tables;
+    private Scene scene;
 
     @FXML
     private TableView<T1Item> ticketsTable;
@@ -68,7 +76,7 @@ public class T1Controller implements Initializable {
 
     @FXML
     private Button createButton;
-    
+
     @FXML
     private TabPane tabPane;
 
@@ -77,6 +85,7 @@ public class T1Controller implements Initializable {
         finalData = resultTable.getItems();
         setHashMapOfTables();
         availableFolders = preferences.getFOLDERS();
+        
 //        tempTickets = ticketsTable.getItems();
 //        changeTempData("tickets");
 //        fillTable(availableFolders.length - 1, tempTickets);
@@ -93,9 +102,7 @@ public class T1Controller implements Initializable {
                     list.add(item);
                 }
             }
-            
         }
-
     }
 
     @FXML
@@ -106,10 +113,10 @@ public class T1Controller implements Initializable {
         }
         if (evt != null) {
             clickedTab = (Tab) evt.getSource();
-        }else{
+        } else {
             clickedTab = tabPane.getSelectionModel().getSelectedItem();
         }
-        
+
         if (clickedTab.isSelected()) {
             changeTempData(clickedTab.getId());
         }
@@ -118,12 +125,60 @@ public class T1Controller implements Initializable {
 
     @FXML
     void onCreateClick() {
+        scene = tabPane.getScene();
+        scene.setCursor(Cursor.WAIT);
+        File mergedFile = null;
 
+        String mergedName = tryToCreateName(finalData.get(0).fileName.get());
+
+        PDFMergerUtility mergeUtil = new PDFMergerUtility();
+
+        Optional<ButtonType> result = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?").showAndWait();
+
+        if (result.get() == ButtonType.OK) {
+            mergeUtil.setDestinationFileName(System.getProperty("user.home") + "/Desktop/" + mergedName);
+            mergedFile = new File(System.getProperty("user.home") + "/Desktop/" + mergedName);
+            
+            for (T1Item tempTicket : tempTickets) {
+                try {
+                    mergeUtil.addSource(tempTicket.getFile());
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(PDFMergerController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            try {
+                mergeUtil.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
+                Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Merge completed", "Merge completed", "Merge file saved on Desktop:\n" + mergedName);
+
+                Optional<ButtonType> o = a.showAndWait();
+
+            } catch (IOException ex) {
+                AlertUtils.getSimpleAlert(Alert.AlertType.WARNING, "Merge not completed", "Action aborted", ex.getMessage()).show();
+                Logger.getLogger(PDFMergerController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        scene.setCursor(Cursor.DEFAULT);
+    }
+    
+     //file name creation for merged pdf document
+    private String tryToCreateName(String name) {
+        String mergedName;
+        String[] parts = name.split("_");
+        if (parts != null && parts.length > 2) {
+            mergedName = "Merged_" + parts[0] + "_" + parts[2] + ".pdf";
+        } else {
+            mergedName = "Merged_no_name_" + System.currentTimeMillis() + ".pdf";
+        }
+
+        return mergedName;
     }
 
     private void changeTempData(String id) {
+        System.out.println(id);
         if (id.equals("tickets")) {
             tempTickets = tables.get("tickets").getItems();
+
         } else {
             tempDataReceived = tables.get(id + "O").getItems();
             tempDataSent = tables.get(id + "I").getItems();
@@ -152,17 +207,18 @@ public class T1Controller implements Initializable {
                 spec = 6;
                 break;
         }
-        
+
         if (spec < 8) {
             fillTable(spec, tempDataReceived);
             fillTable(spec + 1, tempDataSent);
-        }else{
+        } else {
             fillTable(spec, tempTickets);
         }
-        
+
     }
 
     private void setHashMapOfTables() {
+
         tables = new HashMap<>();
 
         tables.put("MT200O", MT200OTable);
@@ -178,6 +234,7 @@ public class T1Controller implements Initializable {
         tables.put("MT320I", MT320ITable);
 
         tables.put("tickets", ticketsTable);
+
     }
 
     @FXML

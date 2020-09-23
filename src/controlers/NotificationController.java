@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -89,17 +90,20 @@ public class NotificationController implements Initializable, IOnFileReceived {
             @Override
             public Object call(Object tv) {
                 TableRow<MTEntity> row = new TableRow<>();
-                row.setOnMouseClicked((MouseEvent event) -> {
-                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
-                            && event.getClickCount() == 2) {
-
-                        clickedRow = row.getItem();
-                        try {
-                            loadScene("mt_dispay");
-                        } catch (IOException ex) {
-                            Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (Exception ex) {
-                            Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+                row.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
+                                && event.getClickCount() == 2) {
+                            
+                            clickedRow = row.getItem();
+                            try {
+                                loadScene("mt_dispay");
+                            } catch (IOException ex) {
+                                Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (Exception ex) {
+                                Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                     }
                 });

@@ -9,9 +9,11 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
@@ -30,16 +32,23 @@ public class SettingsController implements Initializable {
     ObservableList<SettingsItem> data;
     private ArrayList<SettingsItem> items;
     public static BooleanProperty SETTINGS_CHANGED = new SimpleBooleanProperty(false);
+    public static BooleanProperty OBSERVER_STATUS = new SimpleBooleanProperty(false);
+    private boolean watchStatus;
 
     @FXML
     private TableView table;
     @FXML
     private Label title;
+    @FXML
+    private RadioButton notificationRadioButton;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         title.setText(LoginController.MODE + " Settings");
         setTableData();
+        notificationRadioButton.setSelected(preferences.getObserverStatus());
+        watchStatus = notificationRadioButton.isSelected();
+        
 
     }
 
@@ -102,7 +111,12 @@ public class SettingsController implements Initializable {
     private File openFileChooser(String path) {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory");
-        dirChooser.setInitialDirectory(new File(path));
+        if (new File(path).exists()) {
+            dirChooser.setInitialDirectory(new File(path));
+        }else{
+            dirChooser.setInitialDirectory(null);
+        }
+        
         return dirChooser.showDialog(table.getScene().getWindow());
     }
     
@@ -149,5 +163,11 @@ public class SettingsController implements Initializable {
         }
 
     }
-
+    
+    @FXML
+    private void onNotificationRBClick(ActionEvent evt){
+            MasterControler.OBSERVE_ON = notificationRadioButton.isSelected();
+            preferences.setObserverStatus(MasterControler.OBSERVE_ON);
+            OBSERVER_STATUS.set(MasterControler.OBSERVE_ON);
+    }
 }

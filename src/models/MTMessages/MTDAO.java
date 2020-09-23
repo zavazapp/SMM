@@ -25,6 +25,7 @@ public class MTDAO {
     FileUtils fileUtils = new FileUtils();
     private ArrayList<MTEntity> list;
     private Calendar c;
+    private ObservableList<MTEntity> observableList;
 
     public MTDAO() {
     }
@@ -58,7 +59,12 @@ public class MTDAO {
             new Runnable() {
                 @Override
                 public void run() {
-                    list = new ArrayList<>();
+                    if (list == null) {
+                        list = new ArrayList<>();
+                    }else{
+                        list.clear();
+                    }
+                    
                     for (File file : observedDir.listFiles()) {
                         MTEntity mt;
 
@@ -131,7 +137,8 @@ public class MTDAO {
     }
 
     public ObservableList<MTEntity> getObservableList(Path ppiRoot, Date date, String currentSelection, boolean isLive) {
-        return FXCollections.observableArrayList(getAll(ppiRoot, date, currentSelection, isLive));
+        this.observableList = FXCollections.observableArrayList(getAll(ppiRoot, date, currentSelection, isLive));
+        return observableList;
         
     }
 

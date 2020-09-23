@@ -16,7 +16,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -50,7 +49,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import models.MTMessages.MTDAO;
 import models.MTMessages.MTEntity;
 import preferences.PPIPreferences;
@@ -61,6 +59,7 @@ import utils.FileUtils;
 public class MasterControler implements Initializable, ListChangeListener<MTEntity> {
 
     public static boolean CHANGING_FILE_NAME_ONLY;
+    public static boolean OBSERVE_ON;
     private DisplayDataModel d;
     private preferences.MasterPreferences preferences;
     private final MTDAO mtdao = new MTDAO();
@@ -114,13 +113,21 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         fileUtils = new FileUtils();
         setRawPaintPolicy();
         setSettingsListener();
-        setDirectoryWatchers();
+        OBSERVE_ON = preferences.getObserverStatus();
+        
+        if (OBSERVE_ON) {
+            setDirectoryWatchers();
+        }
     }
 
     private void createDisplayObject() {
         /*PPI*/
         if (LoginController.MODE.equals("PPI")) {
             preferences = PPIPreferences.getInstance(getClass());
+            if (d != null) {
+                d.getData().removeListener(this);
+                d = null;
+            }
 
             d = new PPIDisplayDataModel(
                     true,
@@ -143,6 +150,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             );
         }
         d.getData().addListener(this);
+        
     }
 
     @FXML
@@ -239,10 +247,17 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     }
 
     //can invalidate data, table and nav labels
+    private Task task;
+    private Thread thread;
+
     private void invalidateOnSeparateThread(LocalDate newValue) {
         setRawPaintPolicy();
         scene.setCursor(Cursor.WAIT);
-        Task task = new Task() {
+        if (task != null) {
+            task.cancel();
+        }
+
+        task = new Task() {
             @Override
             protected Object call() throws Exception {
 
@@ -259,28 +274,28 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
 
             private void invalidateNavLabels() {
 
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < d.getNavLabels().length - 1; i++) {
-                            count = mtdao.getCount(Paths.get(preferences.getRoot().toString(), preferences.getFOLDERS()[i]), java.sql.Date.valueOf(datePicker.getValue()), d.isLive());
-                            if (d.getNavLabels()[i].getText().contains("Sent")) {
-                                labelText = "Sent";
-                            } else {
-                                labelText = "Rec";
-                            }
-
-                            if (count > 0) {
-                                d.getNavLabels()[i].setStyle("-fx-font-weight: bold;");
-                            }
-                            d.getNavLabels()[i].setText(labelText.concat("(").concat(String.valueOf(count).concat(")")));
+                Platform.runLater(() -> {
+                    for (int i = 0; i < d.getNavLabels().length - 1; i++) {
+                        count = mtdao.getCount(Paths.get(preferences.getRoot().toString(), preferences.getFOLDERS()[i]), java.sql.Date.valueOf(datePicker.getValue()), d.isLive());
+                        if (d.getNavLabels()[i].getText().contains("Sent")) {
+                            labelText = "Sent";
+                        } else {
+                            labelText = "Rec";
                         }
+                        
+                        if (count > 0) {
+                            d.getNavLabels()[i].setStyle("-fx-font-weight: bold;");
+                        }
+                        d.getNavLabels()[i].setText(labelText.concat("(").concat(String.valueOf(count).concat(")")));
                     }
                 });
             }
 
         };
-        new Thread(task).start();
+
+        thread = new Thread(task);
+
+        thread.start();
     }
 
     private void addDatePickerValueChangeListener() {
@@ -387,26 +402,23 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private MTEntity clickedRow;
 
     private void setRawClickListener() {
-        table.setRowFactory(new Callback() {
-            @Override
-            public Object call(Object tv) {
-                TableRow<MTEntity> row = new TableRow<>();
-                row.setOnMouseClicked((MouseEvent event) -> {
-                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
-                            && event.getClickCount() == 2) {
-
-                        clickedRow = row.getItem();
-                        try {
-                            loadScene("mt_dispay");
-                        } catch (IOException ex) {
-                            Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (Exception ex) {
-                            Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+        table.setRowFactory((Object tv) -> {
+            TableRow<MTEntity> row = new TableRow<>();
+            row.setOnMouseClicked((MouseEvent event) -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
+                        && event.getClickCount() == 2) {
+                    
+                    clickedRow = row.getItem();
+                    try {
+                        loadScene("mt_dispay");
+                    } catch (IOException ex) {
+                        Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (Exception ex) {
+                        Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                });
-                return row;
-            }
+                }
+            });
+            return row;
         });
     }
 
@@ -655,10 +667,15 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     }
 
     private void setSettingsListener() {
-        SettingsController.SETTINGS_CHANGED.addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                invalidateOnSeparateThread(LocalDate.now());
+        SettingsController.SETTINGS_CHANGED.addListener((Observable observable) -> {
+            invalidateOnSeparateThread(LocalDate.now());
+            
+        });
+        SettingsController.OBSERVER_STATUS.addListener((Observable o) -> {
+            if (SettingsController.OBSERVER_STATUS.get()) {
+                setDirectoryWatchers();
+            }else{
+                DirectoryWatcher.closeWatcher();
             }
         });
     }
@@ -672,7 +689,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                     if (preferences.getSpecificForder(i).toFile().exists()) {
                         dirs.add(preferences.getSpecificForder(i));
                     }
-                    
+
                 }
 
                 DirectoryWatcher watcher = new DirectoryWatcher(dirs);

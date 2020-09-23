@@ -326,6 +326,9 @@ public class FileUtils {
 
         String temp = text.substring(tempStartIndex, endIndex);
         int indexOfBracket = temp.indexOf("(");
+        if (indexOfBracket == -1) {
+            return "NA";
+        }
         return temp.substring(indexOfBracket - 4, indexOfBracket - 1).trim();
     }
 

@@ -1,5 +1,6 @@
 package Tools;
 
+import controlers.MasterControler;
 import controlers.NotificationController;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
 import static controlers.MasterControler.CHANGING_FILE_NAME_ONLY;
+import controlers.SettingsController;
 
 /**
  * This class sets watchers on directories that are checked in settings to
@@ -52,7 +54,7 @@ public class DirectoryWatcher implements Runnable {
                 Logger.getLogger(DirectoryWatcher.class.getName()).log(Level.SEVERE, null, ex);
                 continue;
             }
-            if (key != null && !path.toString().isEmpty()  && path.toFile().exists()) {
+            if (key != null && !path.toString().isEmpty()  && path.toFile().exists() && path.toFile() != null) {
                 keys.put(key, path);
             }
             
@@ -100,11 +102,8 @@ public class DirectoryWatcher implements Runnable {
                         && filename.getFileName().toString().endsWith(".pdf")) {
                     if (!CHANGING_FILE_NAME_ONLY) {
                     System.out.println(filename);
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            notificationControler.onFileReceived(keys.get(key), filename);
-                        }
+                    Platform.runLater(() -> {
+                        notificationControler.onFileReceived(keys.get(key), filename);
                     });
 
                     }
@@ -125,7 +124,7 @@ public class DirectoryWatcher implements Runnable {
 
     @Override
     public void run() {
-        if (true) {
+        if (MasterControler.OBSERVE_ON) {
             try {
                 startMTListener();
             } catch (IOException ex) {
@@ -146,6 +145,7 @@ public class DirectoryWatcher implements Runnable {
         if (watcher != null) {
             try {
                 watcher.close();
+                System.err.println("Observer STOPED");
             } catch (IOException ex) {
                 Logger.getLogger(DirectoryWatcher.class.getName()).log(Level.SEVERE, null, ex);
             }
