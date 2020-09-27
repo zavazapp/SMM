@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import utils.AlertUtils;
+import utils.Screen;
 
 /**
  * FXML Controller class
@@ -59,11 +60,12 @@ public class LoginController implements Initializable {
         deptLabel.setText(MODE);
         versionLabel.setText("Ver. " + VERSION);
 
-//        String email = System.getProperty("user.name") != null ? System.getProperty("user.name") : "";
-//        userEmailLabel.setText(email != null ? email.concat("@aikbanka.rs") : "Unknown user");
-//
-//        NAME = utils.StringUtils.getNameFromUser(email);
+        String email = System.getProperty("user.name") != null ? System.getProperty("user.name") : "";
+        userEmailLabel.setText(email != null ? email.concat("@aikbanka.rs") : "Unknown user");
+
+        NAME = utils.StringUtils.getNameFromUser(email);
         setMode(null);
+        
     }
 
     /**
@@ -96,15 +98,15 @@ public class LoginController implements Initializable {
         passField.requestFocus();
     }
 
-    public void exit() {
-        System.exit(0);
-    }
-
     public void login() throws IOException {
         if (passField.getText().equals(MODE.toLowerCase())) {
             loadScene();
         } else {
 
+            if (alert == null) {
+                alert = AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Login error!", "Wrong password!", "Try again.");
+            }
+            
             alert.showAndWait();
             passField.setText("");
             passField.requestFocus();
@@ -140,6 +142,7 @@ public class LoginController implements Initializable {
             stage.setScene(new Scene(loader.load()));
             Platform.runLater(() -> {
                 stage.show();
+                stage.centerOnScreen();
             });
         }
     }

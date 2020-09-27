@@ -2,9 +2,6 @@ package preferences;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -55,14 +52,22 @@ public class MasterPreferences {
     public File getLastOppenedDir() {
         return null;
     }
-    
+
     public void setLastOppenedDir(String lastOppened) {
     }
-    
-    public boolean getObserverStatus(){
+
+    public boolean getObserverStatus() {
         return false;
     }
-    
-    public void setObserverStatus(boolean status){
+
+    public void setObserverStatus(boolean status) {
     }
+
+    public Path getDosijeiFolder() {
+        return null;
+    }
+
+    public void setDosijeiFolder(Path folder) {
+    }
+
 }

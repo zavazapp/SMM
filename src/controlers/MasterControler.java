@@ -97,6 +97,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private Button archiveButton;
     @FXML
     private Button pensionButon;
+    @FXML
+    private Button sendButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -114,10 +116,11 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         setRawPaintPolicy();
         setSettingsListener();
         OBSERVE_ON = preferences.getObserverStatus();
-        
+
         if (OBSERVE_ON) {
             setDirectoryWatchers();
         }
+
     }
 
     private void createDisplayObject() {
@@ -150,7 +153,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             );
         }
         d.getData().addListener(this);
-        
+
     }
 
     @FXML
@@ -219,6 +222,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     }
 
     private void invalidateCount(LocalDate newValue) {
+        int count = mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), java.sql.Date.valueOf(newValue), d.isLive());
         d.setTotalCount(mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), java.sql.Date.valueOf(newValue), d.isLive()));
 
         masterCount.setText(String.valueOf(d.getTotalCount()));
@@ -282,12 +286,15 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                         } else {
                             labelText = "Rec";
                         }
-                        
+
                         if (count > 0) {
                             d.getNavLabels()[i].setStyle("-fx-font-weight: bold;");
                         }
                         d.getNavLabels()[i].setText(labelText.concat("(").concat(String.valueOf(count).concat(")")));
                     }
+                    invalidateCount(d.getDate());
+
+                    invalidateButtons();
                 });
             }
 
@@ -296,6 +303,15 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         thread = new Thread(task);
 
         thread.start();
+    }
+
+    private void invalidateButtons() {
+        if (currentSelectionLabel != null) {
+            sendButton.setDisable(!(currentSelectionLabel.getId().contains("MT202")
+                    || currentSelectionLabel.getId().contains("MT19")
+                    || currentSelectionLabel.getId().contains("MT299")
+                    || currentSelectionLabel.getId().contains("MT999")));
+        }
     }
 
     private void addDatePickerValueChangeListener() {
@@ -312,11 +328,9 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     @Override
     public void onChanged(Change<? extends MTEntity> c) {
         //update table and labels
-
         if (c.next()) {
             d.setData(mtdao.getObservableList(preferences.getRoot(), java.sql.Date.valueOf(datePicker.getValue()), currentSelectionLabel.getId(), d.isLive()));
         }
-
         invalidateCount(datePicker.getValue());
     }
 
@@ -346,6 +360,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                     PPIPreferences.getInstance(getClass()).setLastMode();
                     loader = new FXMLLoader(MasterControler.class.getResource("/FXMLFiles/Login.fxml"));
                     stage = (Stage) scene.getScene().getWindow();
+
                 }
                 break;
             case "mt_dispay":
@@ -375,17 +390,16 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                     MtTextDisplayController c = loader.getController();
                     c.setText(clickedRow);
                     break;
-                case "notification":
-//                    NotificationController n = loader.getController();
-//                    n.setData(root, filePath);
+                case "t1":
                     break;
             }
 
             if (stage != null) {
                 stage.setScene(newScene);
                 stage.show();
-            }
+                stage.centerOnScreen();
 
+            }
         }
     }
 
@@ -407,7 +421,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             row.setOnMouseClicked((MouseEvent event) -> {
                 if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
                         && event.getClickCount() == 2) {
-                    
+
                     clickedRow = row.getItem();
                     try {
                         loadScene("mt_dispay");
@@ -466,7 +480,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                 Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        CHANGING_FILE_NAME_ONLY = false;
+//        CHANGING_FILE_NAME_ONLY = false;
         scene.setCursor(Cursor.DEFAULT);
 
         //inform user about action completion
@@ -511,10 +525,6 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             }
 
             File archiveRootYear = new File(archiveRoot + File.separator + Calendar.getInstance().get(Calendar.YEAR));
-
-            if (!archiveRootYear.exists()) {
-                archiveRootYear.mkdir();
-            }
 
             if (!archiveRootYear.exists()) {
                 archiveRootYear.mkdir();
@@ -669,12 +679,12 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private void setSettingsListener() {
         SettingsController.SETTINGS_CHANGED.addListener((Observable observable) -> {
             invalidateOnSeparateThread(LocalDate.now());
-            
+
         });
         SettingsController.OBSERVER_STATUS.addListener((Observable o) -> {
             if (SettingsController.OBSERVER_STATUS.get()) {
                 setDirectoryWatchers();
-            }else{
+            } else {
                 DirectoryWatcher.closeWatcher();
             }
         });
@@ -686,7 +696,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             protected Object call() throws Exception {
                 ArrayList<Path> dirs = new ArrayList<>();
                 for (int i = 0; i < preferences.getFOLDERS().length; i++) {
-                    if (preferences.getSpecificForder(i).toFile().exists()) {
+                    if (preferences.getSpecificForder(i).toFile().exists() && !preferences.getSpecificForder(i).equals(preferences.getDosijeiFolder())) {
                         dirs.add(preferences.getSpecificForder(i));
                     }
 

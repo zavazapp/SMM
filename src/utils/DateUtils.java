@@ -23,6 +23,8 @@ public class DateUtils {
             formatedDate = getFormatedFromSlashed(unformated);
         } else if (unformated.contains(" ")) {
             formatedDate = getFormatedFromBlanks(unformated);
+        } else if (unformated.contains("-")) {
+            formatedDate = getFormatedFromMinusSign(unformated);
         } else {
             formatedDate = getFormatedFromNonBlanks(unformated);
         }
@@ -75,6 +77,24 @@ public class DateUtils {
         return temp;
     }
 
+    private static String getFormatedFromMinusSign(String unformated) {
+        String temp = unformated;
+
+        SimpleDateFormat inputFormat = new SimpleDateFormat("MM-dd-yyyy");
+
+        try {
+            Date date = inputFormat.parse(unformated);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yy");
+
+            temp = outputFormat.format(date);
+
+        } catch (ParseException ex) {
+            Logger.getLogger(DateUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "NA";
+        }
+        return temp;
+    }
+
     private static String getFormatedFromMilis(long milis) {
         String temp = "";
 
@@ -104,4 +124,52 @@ public class DateUtils {
 
         return today.equals(userChoice);
     }
+
+    public static String getYearFromTicket(String date) {
+        if (date == null || date.equals("") || date.equals("NA")) {
+            return "NA";
+        }
+        return getYearFromMt(date);
+    }
+
+    public static String getYearFromMt(String dateReceived) {
+        if (dateReceived.length() > 9) {
+            dateReceived = getFormatedDate(dateReceived);
+        }
+
+        SimpleDateFormat inputFormat = new SimpleDateFormat("dd.MM.yy");
+        Date date;
+        Calendar c = Calendar.getInstance();
+        try {
+            date = inputFormat.parse(dateReceived);
+            c.setTime(date);
+        } catch (ParseException ex) {
+            Logger.getLogger(DateUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "NA";
+        }
+        return String.valueOf(c.get(Calendar.YEAR));
+    }
+
+    public static String getMonthFromMt(String dateReceived) {
+        if (dateReceived.length() > 9) {
+            dateReceived = getFormatedDate(dateReceived);
+        }
+        SimpleDateFormat inputFormat = new SimpleDateFormat("dd.MM.yy");
+        Date date;
+        Calendar c = Calendar.getInstance();
+        try {
+            date = inputFormat.parse(dateReceived);
+            c.setTime(date);
+        } catch (ParseException ex) {
+            Logger.getLogger(DateUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "NA";
+        }
+        return String.valueOf(c.get(Calendar.MONTH)+ 1);
+    }
+
+    public static String getMonthFromTicket(String dateReceived) {
+
+        return getMonthFromMt(dateReceived);
+    }
+
 }

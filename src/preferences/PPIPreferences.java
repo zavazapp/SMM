@@ -22,9 +22,9 @@ public class PPIPreferences extends MasterPreferences {
     private static PPIPreferences ppiPreferences;
     //default folders
     private final String PPI_ROOT = "\\\\sftp\\PPI\\MT_SWIFT";
-   // private final String PPI_ROOT = "C:\\Users\\Korisnik\\Desktop\\MT_PPI\\MT_SWIFT";
+    // private final String PPI_ROOT = "C:\\Users\\Korisnik\\Desktop\\MT_PPI\\MT_SWIFT";
     private final String TBO_DIR = "\\\\sftp\\tbo";
-  //  private final String TBO_DIR = "C:\\Users\\Korisnik\\Desktop\\MT_TBO";
+    //  private final String TBO_DIR = "C:\\Users\\Korisnik\\Desktop\\MT_TBO";
     //folders available in navigation menu
     private final List<String> AVAILABLE_TBO_FOLDERS = Arrays.asList("MT202I", "MT202O", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O");
     private final String[] PPI_FOLDERS = new String[]{"MT192I", "MT192O", "MT195I", "MT195O", "MT196I", "MT196O", "MT199I", "MT199O", "MT202I", "MT202O", "MT299I", "MT299O", "MT999I", "MT999O", "Zahtevi za povracaj"};
@@ -144,9 +144,14 @@ public class PPIPreferences extends MasterPreferences {
     public void setObserverStatus(boolean status) {
         preferences.putBoolean("observer_status", status);
     }
-    
-    
-    
+
+    public double getFont() {
+        return preferences.getDouble("font", 12);
+    }
+
+    public void setFont(double font) {
+        preferences.putDouble("font", font);
+    }
 
     //on ResetToDefault click impl.
     @Override

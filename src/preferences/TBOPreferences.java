@@ -26,7 +26,8 @@ public class TBOPreferences extends MasterPreferences {
     //folders available in navigation menu
     public final List<String> AVAILABLE_PPI_FOLDERS = Arrays.asList("MT202O", "MT202I", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O");
     private final String[] TBO_FOLDERS = new String[]{"MT200I", "MT200O", "MT202I", "MT202O", "MT300I", "MT300O", "MT320I", "MT320O", "MT950I", "MT950O", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O", "TIKETI"};
-    //default value of observers
+    private final String TBO_DOSIJEI = "\\\\sftp\\tbo\\DOSIJEI\\";
+//default value of observers
     private final boolean[] TBO_STATUSES = new boolean[]{false, false, false, false, false, false, false, false, false, false};
     //TODO - not implemented yet. Idea is to rename file automaticly
     private final boolean TBO_AUTO_RENAME = false;
@@ -131,6 +132,16 @@ public class TBOPreferences extends MasterPreferences {
         preferences.putBoolean("observer_status", status);
     }
 
+    @Override
+    public Path getDosijeiFolder() {
+        return Paths.get(preferences.get("TBO_DOSIJEI", TBO_DOSIJEI));
+    }
+
+    @Override
+    public void setDosijeiFolder(Path path) {
+        preferences.put("TBO_DOSIJEI", path.toString());
+    }
+
     //on ResetToDefault click impl.
     @Override
     public void resetPreferencesToDefault() {
@@ -138,6 +149,7 @@ public class TBOPreferences extends MasterPreferences {
         setSendDir(Paths.get(PPI_DIR));
         setTBOAutoRename(false);
         resetTBORoot(TBO_ROOT);
+        setDosijeiFolder(Paths.get(TBO_DOSIJEI));
     }
 
     //if root folder is changed all other folders are changet to point to root folder

@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="scene" maxWidth="1.7976931348623157E308" prefHeight="235.0" prefWidth="985.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.MasterControler">
+<VBox fx:id="scene" alignment="TOP_CENTER" prefHeight="235.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.MasterControler">
     <children>
         <MenuBar>
             <menus>
@@ -455,7 +455,7 @@
                         <Insets top="16.0" />
                      </VBox.margin>
                   </Button>
-                  <Button id="TBO" mnemonicParsing="false" onMouseClicked="#onSendClick" text="Send to TBO">
+                  <Button id="TBO" fx:id="sendButton" mnemonicParsing="false" onMouseClicked="#onSendClick" text="Send to TBO">
                      <VBox.margin>
                         <Insets top="128.0" />
                      </VBox.margin>

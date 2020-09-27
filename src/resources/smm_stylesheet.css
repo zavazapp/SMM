@@ -18,3 +18,8 @@
 .ppiLight{
     -fx-background-color: #5050C8;
 }
+
+.bordered{
+    -fx-border-color: #5050C8;
+    
+}

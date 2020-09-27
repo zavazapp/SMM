@@ -10,113 +10,103 @@
 <?import javafx.scene.effect.SepiaTone?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.152" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.LoginController">
+<HBox alignment="CENTER" fillHeight="false" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.LoginController">
    <children>
-      <HBox layoutX="194.0" layoutY="141.0" maxWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Pane styleClass="bordered" HBox.hgrow="ALWAYS">
          <children>
-            <Pane prefHeight="250.0" prefWidth="200.0" HBox.hgrow="NEVER">
+            <Label layoutX="11.0" layoutY="160.0" rotate="-42.0" text="Welcome back!">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <textFill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop color="BLACK" />
+                        <Stop color="#512b58" offset="0.007662835249042145" />
+                        <Stop color="#5050c8" offset="0.007662835249042145" />
+                        <Stop color="#512b58" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </textFill>
+            </Label>
+            <ImageView fitHeight="55.0" fitWidth="90.0" layoutX="55.0" layoutY="32.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/Transfer-files2.png" />
+               </image>
+            </ImageView>
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="144.0" prefHeight="105.0" prefWidth="180.0" text="Swift&#10;Messages&#10;Management" textAlignment="RIGHT" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <textFill>
+                  <LinearGradient endX="1.0" endY="1.0" startX="0.5047619047619047" startY="1.0">
+                     <stops>
+                        <Stop color="#5050c8" />
+                        <Stop color="#512b58" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </textFill>
+               <effect>
+                  <SepiaTone />
+               </effect>
+            </Label>
+            <Label fx:id="versionLabel" layoutX="9.0" layoutY="269.0" text="Version" />
+         </children>
+      </Pane>
+      <Pane fx:id="rightHalfPane" style="-fx-background-color: #5050C8;" HBox.hgrow="NEVER">
+         <children>
+            <Label layoutX="106.0" layoutY="47.0" text="Login" textFill="WHITE">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+            <PasswordField fx:id="passField" layoutX="76.0" layoutY="109.0" onKeyPressed="#onKeyPressed" promptText="Password" />
+            <Button layoutX="179.0" layoutY="150.0" mnemonicParsing="false" onMouseClicked="#login" text="Login" />
+            <HBox alignment="CENTER" fillHeight="false" layoutY="271.0" style="-fx-border-color: #ffff;">
                <children>
-                  <Label layoutX="11.0" layoutY="160.0" rotate="-42.0" text="Welcome back!">
+                  <Button fx:id="LoginController" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#setMode" prefHeight="30.0" prefWidth="153.0" style="-fx-background-color: #5050C8;" text="PPI" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
                      <font>
                         <Font size="14.0" />
                      </font>
-                     <textFill>
-                        <LinearGradient endX="1.0" endY="1.0">
-                           <stops>
-                              <Stop color="BLACK" />
-                              <Stop color="#512b58" offset="0.007662835249042145" />
-                              <Stop color="#5050c8" offset="0.007662835249042145" />
-                              <Stop color="#512b58" offset="1.0" />
-                           </stops>
-                        </LinearGradient>
-                     </textFill>
-                  </Label>
-                  <ImageView fitHeight="55.0" fitWidth="90.0" layoutX="55.0" layoutY="32.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../resources/Transfer-files2.png" />
-                     </image>
-                  </ImageView>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="144.0" prefHeight="105.0" prefWidth="180.0" text="Swift&#10;Messages&#10;Management" textAlignment="RIGHT" wrapText="true">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <textFill>
-                        <LinearGradient endX="1.0" endY="1.0" startX="0.5047619047619047" startY="1.0">
-                           <stops>
-                              <Stop color="#5050c8" />
-                              <Stop color="#512b58" offset="1.0" />
-                           </stops>
-                        </LinearGradient>
-                     </textFill>
                      <effect>
-                        <SepiaTone />
+                        <InnerShadow color="#5050c8" height="80.0" radius="39.5" width="80.0" />
                      </effect>
-                  </Label>
-                  <Label fx:id="versionLabel" layoutX="9.0" layoutY="269.0" text="Version" />
-               </children>
-            </Pane>
-            <Pane fx:id="rightHalfPane" maxWidth="-Infinity" prefHeight="279.0" prefWidth="300.0" style="-fx-background-color: #5050C8;" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label layoutX="106.0" layoutY="47.0" text="Login" textFill="WHITE">
+                  </Button>
+                  <Button alignment="TOP_CENTER" contentDisplay="CENTER" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#setMode" prefHeight="30.0" prefWidth="148.0" style="-fx-background-color: #512B58;" text="TBO" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
                      <font>
-                        <Font size="36.0" />
+                        <Font size="14.0" />
                      </font>
-                  </Label>
-                  <PasswordField fx:id="passField" layoutX="76.0" layoutY="109.0" onKeyPressed="#onKeyPressed" promptText="Password" />
-                  <Button layoutX="179.0" layoutY="150.0" mnemonicParsing="false" onMouseClicked="#login" text="Login" />
-                  <HBox alignment="CENTER" fillHeight="false" layoutY="271.0" prefHeight="27.0" prefWidth="300.0" style="-fx-border-color: #ffff;">
-                     <children>
-                        <Button fx:id="LoginController" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#setMode" prefHeight="30.0" prefWidth="153.0" style="-fx-background-color: #5050C8;" text="PPI" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <effect>
-                              <InnerShadow color="#5050c8" height="80.0" radius="39.5" width="80.0" />
-                           </effect>
-                        </Button>
-                        <Button alignment="TOP_CENTER" contentDisplay="CENTER" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#setMode" prefHeight="30.0" prefWidth="148.0" style="-fx-background-color: #512B58;" text="TBO" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <effect>
-                              <InnerShadow color="#512b58" height="80.0" radius="39.5" width="80.0" />
-                           </effect>
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                        </Button>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
+                     <effect>
+                        <InnerShadow color="#512b58" height="80.0" radius="39.5" width="80.0" />
+                     </effect>
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
-                  </HBox>
-                  <Label fx:id="userEmailLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="14.0" text="email" textAlignment="CENTER" textFill="WHITE" />
-                  <Label fx:id="deptLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="150.0" opacity="0.22" prefHeight="105.0" prefWidth="174.0" text="DEPT" textFill="#8ed8f5">
-                     <font>
-                        <Font name="System Bold" size="72.0" />
-                     </font>
-                     <effect>
-                        <Glow level="1.0" />
-                     </effect>
-                  </Label>
-                  <Button layoutX="274.0" layoutY="2.0" mnemonicParsing="false" onMouseClicked="#exit" text="X" textFill="#f80000">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
                   </Button>
                </children>
-            </Pane>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </HBox>
+            <Label fx:id="userEmailLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="14.0" text="email" textAlignment="CENTER" textFill="WHITE" />
+            <Label fx:id="deptLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="150.0" opacity="0.22" prefHeight="105.0" prefWidth="174.0" text="DEPT" textFill="#8ed8f5">
+               <font>
+                  <Font name="System Bold" size="72.0" />
+               </font>
+               <effect>
+                  <Glow level="1.0" />
+               </effect>
+            </Label>
          </children>
-      </HBox>
+      </Pane>
    </children>
-</AnchorPane>
+</HBox>

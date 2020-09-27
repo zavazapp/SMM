@@ -43,32 +43,48 @@ public class NotificationController implements Initializable, IOnFileReceived {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        data = table.getItems();
-        setRawClickListener();
+        if (table != null) {
+            data = table.getItems();
+            setRawClickListener();
+        }
 
     }
 
     @Override
     public void onFileReceived(Path root, Path filePath) {
-        if (notification == null) {
+        if (!root.toString().contains("TIKETI")) {
+            if (notification == null) {
+                try {
+                    notification = new NotificationModel(
+                            new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/Notification.fxml")),
+                            new Stage(StageStyle.TRANSPARENT)
+                    );
+                } catch (IOException ex) {
+                    Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            if (!notification.isShowing()) {
+                notification.show();
+            }
+
             try {
-                notification = new NotificationModel(
-                        new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/Notification.fxml")),
-                        new Stage(StageStyle.TRANSPARENT)
-                );
+                setData(root, filePath);
             } catch (IOException ex) {
                 Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        if (!notification.isShowing()) {
-            notification.show();
+        } else {
+            try {
+                notification = new NotificationModel(
+                        new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/TicketNotification.fxml")),
+                        new Stage(StageStyle.TRANSPARENT)
+                );
+                notification.show();
+            } catch (IOException ex) {
+                Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         }
 
-        try {
-            setData(root, filePath);
-        } catch (IOException ex) {
-            Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @FXML
@@ -95,7 +111,7 @@ public class NotificationController implements Initializable, IOnFileReceived {
                     public void handle(MouseEvent event) {
                         if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
                                 && event.getClickCount() == 2) {
-                            
+
                             clickedRow = row.getItem();
                             try {
                                 loadScene("mt_dispay");

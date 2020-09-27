@@ -54,10 +54,10 @@ public class DirectoryWatcher implements Runnable {
                 Logger.getLogger(DirectoryWatcher.class.getName()).log(Level.SEVERE, null, ex);
                 continue;
             }
-            if (key != null && !path.toString().isEmpty()  && path.toFile().exists() && path.toFile() != null) {
+            if (key != null && !path.toString().isEmpty() && path.toFile().exists() && path.toFile() != null) {
                 keys.put(key, path);
             }
-            
+
         }
     }
 
@@ -101,15 +101,15 @@ public class DirectoryWatcher implements Runnable {
                 if (kind == StandardWatchEventKinds.ENTRY_CREATE
                         && filename.getFileName().toString().endsWith(".pdf")) {
                     if (!CHANGING_FILE_NAME_ONLY) {
-                    System.out.println(filename);
-                    Platform.runLater(() -> {
-                        notificationControler.onFileReceived(keys.get(key), filename);
-                    });
-
+                        System.out.println(filename);
+                        Platform.runLater(() -> {
+                            notificationControler.onFileReceived(keys.get(key), filename);
+                        });
+                        
                     }
                 }
-
             }
+            CHANGING_FILE_NAME_ONLY = false;
 
             // Reset the key -- this step is critical if you want to
             // receive further watch events.  If the key is no longer valid,

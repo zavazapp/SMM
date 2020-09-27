@@ -8,14 +8,18 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.5964912280701754" orientation="VERTICAL" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.T1Controller">
+<SplitPane fx:id="rootPane" dividerPositions="0.47660311958405543" orientation="VERTICAL" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.T1Controller">
     <items>
-        <TabPane fx:id="tabPane" prefHeight="800.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
             <tabs>
                 <Tab id="tickets" onSelectionChanged="#onTabSelectionChange" text="TICKETS">
                     <content>
@@ -39,7 +43,7 @@
                             <items>
                                 <TableView id="MT200OTable" fx:id="MT200OTable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT200OFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
+                                        <TableColumn fx:id="MT200OFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -52,7 +56,7 @@
 
                                 <TableView id="MT200ITable" fx:id="MT200ITable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT200IFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
+                                        <TableColumn fx:id="MT200IFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -72,7 +76,7 @@
                             <items>
                                 <TableView id="MT202OTable" fx:id="MT202OTable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT202OFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
+                                        <TableColumn fx:id="MT202OFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -84,7 +88,7 @@
                                 </TableView>
                                 <TableView id="MT202ITable" fx:id="MT202ITable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT202IFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
+                                        <TableColumn fx:id="MT202IFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -104,7 +108,7 @@
                             <items>
                                 <TableView id="MT300OTable" fx:id="MT300OTable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT300OFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
+                                        <TableColumn fx:id="MT300OFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -116,7 +120,7 @@
                                 </TableView>
                                 <TableView id="MT300ITable" fx:id="MT300ITable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT300IFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
+                                        <TableColumn fx:id="MT300IFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -136,7 +140,7 @@
                             <items>
                                 <TableView id="MT320OTable" fx:id="MT320OTable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT320OFileName" minWidth="-1.0" prefWidth="800.0" text="Received" />
+                                        <TableColumn fx:id="MT320OFileName" minWidth="-1.0" prefWidth="800.0" text="Sent" />
                                     </columns>
                                     <columnResizePolicy>
                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -144,7 +148,7 @@
                                 </TableView>
                                 <TableView id="MT320ITable" fx:id="MT320ITable" onMouseClicked="#onTempTableRawClicked" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="MT320IFileName" minWidth="-1.0" prefWidth="800.0" text="Sent">
+                                        <TableColumn fx:id="MT320IFileName" minWidth="-1.0" prefWidth="800.0" text="Received">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="fileName" />
                                             </cellValueFactory>
@@ -195,6 +199,44 @@
                         </VBox>
                     </children>
                 </HBox>
+            <GridPane prefHeight="100.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label text="Sugested file name">
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </Label>
+                  <Label text="Sugested location" GridPane.rowIndex="1">
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </Label>
+                  <TextField fx:id="sugMergeNameTF" GridPane.columnIndex="1">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </TextField>
+                  <TextField fx:id="sugMergeLocTF" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </TextField>
+               </children>
+            </GridPane>
             </children>
         </VBox>
     </items>

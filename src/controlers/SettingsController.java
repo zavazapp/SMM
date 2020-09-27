@@ -48,7 +48,6 @@ public class SettingsController implements Initializable {
         setTableData();
         notificationRadioButton.setSelected(preferences.getObserverStatus());
         watchStatus = notificationRadioButton.isSelected();
-        
 
     }
 
@@ -69,6 +68,7 @@ public class SettingsController implements Initializable {
         if (LoginController.MODE.equals("TBO")) {
             preferences = TBOPreferences.getInstance(getClass());
             items.add(new SettingsItem("TBO_ROOT", preferences.getRoot().toString()));
+            items.add(new SettingsItem("TBO_DOSIJEI", preferences.getDosijeiFolder().toString()));
             items.add(new SettingsItem("PPI_DIR", preferences.getSendDir().toString()));
             for (String s : preferences.getFOLDERS()) {
                 items.add(new SettingsItem(s, preferences.getSpecificForder(Arrays.asList(preferences.getFOLDERS()).indexOf(s)).toString()));
@@ -94,13 +94,16 @@ public class SettingsController implements Initializable {
                         setTableData();
                         break;
                     case 1:
+                        preferences.setDosijeiFolder(fromChooser.toPath());
+                        break;
+                    case 2:
                         preferences.setSendDir(fromChooser.toPath());
                         break;
                     default:
                         preferences.setSpecificFolder(clickedItem.getName(), fromChooser.toPath());
                         break;
                 }
-                
+
                 data.set(index, clickedItem);
                 SETTINGS_CHANGED.set(!SETTINGS_CHANGED.get());
             }
@@ -113,22 +116,22 @@ public class SettingsController implements Initializable {
         dirChooser.setTitle("Choose directory");
         if (new File(path).exists()) {
             dirChooser.setInitialDirectory(new File(path));
-        }else{
+        } else {
             dirChooser.setInitialDirectory(null);
         }
-        
+
         return dirChooser.showDialog(table.getScene().getWindow());
     }
-    
+
     @FXML
-    private void onResetToDefaultClick(){
+    private void onResetToDefaultClick() {
         preferences.resetPreferencesToDefault();
         setTableData();
     }
-    
+
     @FXML
-    private void onCloseClick(){
-     ((Stage) title.getScene().getWindow()).close();
+    private void onCloseClick() {
+        ((Stage) title.getScene().getWindow()).close();
     }
 
     //Settings item model
@@ -163,11 +166,11 @@ public class SettingsController implements Initializable {
         }
 
     }
-    
+
     @FXML
-    private void onNotificationRBClick(ActionEvent evt){
-            MasterControler.OBSERVE_ON = notificationRadioButton.isSelected();
-            preferences.setObserverStatus(MasterControler.OBSERVE_ON);
-            OBSERVER_STATUS.set(MasterControler.OBSERVE_ON);
+    private void onNotificationRBClick(ActionEvent evt) {
+        MasterControler.OBSERVE_ON = notificationRadioButton.isSelected();
+        preferences.setObserverStatus(MasterControler.OBSERVE_ON);
+        OBSERVER_STATUS.set(MasterControler.OBSERVE_ON);
     }
 }

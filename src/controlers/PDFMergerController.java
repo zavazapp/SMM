@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -43,7 +42,6 @@ public class PDFMergerController extends javafx.application.Application implemen
 
     private ObservableList<File> data = FXCollections.observableArrayList();
     MasterPreferences preferences = new PPIPreferences(getClass());
-    private HostServices hostServices;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -94,9 +92,9 @@ public class PDFMergerController extends javafx.application.Application implemen
             }
 
             try {
-                mergeUtil.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
-                Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Merge completed", "Merge completed", "Merge file saved on Desktop:\n" + mergedName);
-                a.getButtonTypes().add(0, new ButtonType("Open file"));
+                mergeUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+                Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "Merge completed", "Merge completed", "Merge file saved on Desktop:\n" + mergedName);
+                a.getButtonTypes().setAll( new ButtonType("Open file"));
 
                 Optional<ButtonType> o = a.showAndWait();
                 if (o.get().equals(a.getButtonTypes().get(0))) {

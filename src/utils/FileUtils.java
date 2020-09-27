@@ -24,12 +24,11 @@ public class FileUtils {
 
         //Workaround for releasing resources in try block for document load - PDDocument.load(file)
         //TODO - test reducing sleep
-        try {
-            Thread.sleep(30);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+//        try {
+//            Thread.sleep(10);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         try (PDDocument doc = PDDocument.load(file)) {
             PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(doc).trim();
@@ -237,6 +236,45 @@ public class FileUtils {
 
         return counter;
     }
+
+//    public int archiveTicket(String resultFolder, File file, String subfolder) {
+//        if (subfolder.equals("NA")) {
+//            JOptionPane.showMessageDialog(null, "Can not determin date!", "Action aborted", JOptionPane.ERROR_MESSAGE);
+//            return 0;
+//        }
+//        File archiveFolder = new File(resultFolder + File.separator + subfolder);
+//
+//        if (!archiveFolder.exists()) {
+//            archiveFolder.mkdir();
+//        }
+//
+//        int counter = 0;
+//
+//        String newFileName = file.getName();
+//        if (newFileName.contains("/")) {
+//            newFileName.replace("/", "-");
+//        }
+//        File newFile = new File(archiveFolder + File.separator + newFileName);
+//
+//        if (newFile.exists()) {
+//            newFile = getUniqueFileName(newFile);
+//            System.out.println("Destination file already exists !\nTrying to create unique name...");
+//            if (newFile == null) {
+//                System.out.println("Can not rename file.");
+//                return 0;
+//            }
+//        }
+//
+//        try {
+//            if (file.renameTo(newFile)) {
+//                counter++;
+//            }
+//        } catch (Exception e) {
+//            Logger.getLogger(FileUtils.class.getName()).log(Level.ALL, null, e);
+//        }
+//
+//        return counter;
+//    }
 
     /**
      * Checks if file is renamed to prevent user to archive not renamed files
