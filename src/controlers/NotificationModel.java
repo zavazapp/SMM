@@ -13,7 +13,7 @@ import javafx.util.Duration;
 
 /**
  *
- * @author Korisnik
+ * @author Miodrag Spasic
  */
 public class NotificationModel {
 
@@ -22,7 +22,7 @@ public class NotificationModel {
     private final Scene scene;
 
     private FadeTransition fadeInTransition, fadeOutTransition;
-    private TranslateTransition slideOutTransition, slideInTransition;
+    private TranslateTransition slideOutTransition, slideInTransition, moveMoreDownTransition;
 
     public NotificationModel(FXMLLoader loader, Stage stage) throws IOException {
         this.loader = loader;
@@ -63,6 +63,12 @@ public class NotificationModel {
             slideOutTransition.setToY(-300);
         }
 
+        if (moveMoreDownTransition == null) {
+            moveMoreDownTransition = new TranslateTransition(Duration.seconds(1), (AnchorPane) scene.getRoot());
+            moveMoreDownTransition.setFromY(4);
+            moveMoreDownTransition.setToY(300);
+        }
+
     }
 
     void show() {
@@ -75,14 +81,22 @@ public class NotificationModel {
         slideOutTransition.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-        stage.hide();
-        
+                stage.hide();
+
             }
         });
     }
-    
-    boolean isShowing(){
+
+    boolean isShowing() {
         return stage.isShowing();
+    }
+
+    void moveDown() {
+        stage.setY(200d);
+    }
+
+    boolean isMovedDown() {
+        return stage.getY() == 4.0;
     }
 
 }

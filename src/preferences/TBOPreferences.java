@@ -19,14 +19,15 @@ public class TBOPreferences extends MasterPreferences {
 
     private static TBOPreferences tboPreferences;
     //default folders
-    private final String TBO_ROOT = "\\\\sftp\\tbo";
+    private final String TBO_ROOT = "\\\\sftp\\tbo\\MT_SWIFT";
     // private final String TBO_ROOT = "C:\\Users\\Korisnik\\Desktop\\MT_TBO";
     private final String PPI_DIR = "\\\\sftp\\PPI\\MT_SWIFT";
     // private final String PPI_DIR = "C:\\Users\\Korisnik\\Desktop\\MT_PPI\\MT_SWIFT";
     //folders available in navigation menu
     public final List<String> AVAILABLE_PPI_FOLDERS = Arrays.asList("MT202O", "MT202I", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O");
-    private final String[] TBO_FOLDERS = new String[]{"MT200I", "MT200O", "MT202I", "MT202O", "MT300I", "MT300O", "MT320I", "MT320O", "MT950I", "MT950O", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O", "TIKETI"};
+    private final String[] TBO_FOLDERS = new String[]{"MT200I", "MT200O", "MT202I", "MT202O", "MT300I", "MT300O", "MT320I", "MT320O", "MT950I", "MT950O", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O"};
     private final String TBO_DOSIJEI = "\\\\sftp\\tbo\\DOSIJEI\\";
+    private final String TBO_TICKETS = "\\\\sftp\\tbo\\Tiketi\\";
 //default value of observers
     private final boolean[] TBO_STATUSES = new boolean[]{false, false, false, false, false, false, false, false, false, false};
     //TODO - not implemented yet. Idea is to rename file automaticly
@@ -124,7 +125,7 @@ public class TBOPreferences extends MasterPreferences {
 
     @Override
     public boolean getObserverStatus() {
-        return preferences.getBoolean("observer_status", false);
+        return preferences.getBoolean("observer_status", true);
     }
 
     @Override
@@ -142,14 +143,26 @@ public class TBOPreferences extends MasterPreferences {
         preferences.put("TBO_DOSIJEI", path.toString());
     }
 
+    @Override
+    public Path getTicketsFolder() {
+        return Paths.get(preferences.get("TBO_TICKETS", TBO_TICKETS));
+    }
+
+    @Override
+    public void setTicketsFolder(Path path) {
+        preferences.put("TBO_TICKETS", path.toString());
+    }
+
     //on ResetToDefault click impl.
     @Override
     public void resetPreferencesToDefault() {
         setRoot(Paths.get(TBO_ROOT));
         setSendDir(Paths.get(PPI_DIR));
         setTBOAutoRename(false);
+        setObserverStatus(true);
         resetTBORoot(TBO_ROOT);
         setDosijeiFolder(Paths.get(TBO_DOSIJEI));
+        setTicketsFolder(Paths.get(TBO_TICKETS));
     }
 
     //if root folder is changed all other folders are changet to point to root folder

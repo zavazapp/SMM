@@ -40,13 +40,15 @@ public class MtTextDisplayController implements Initializable {
         textArea.setFont(Font.font(preferences.getFont()));
         fontComboBox.setValue(textArea.getFont().getSize());
         fontComboBox.setItems(comboItems);
-        
-        
     }
 
     public void setText(MTEntity mt) {
         this.mt = mt;
         textArea.setText(mt.getText());
+    }
+    
+    public void setText(String txt){
+        textArea.setText(txt);
     }
 
     @FXML

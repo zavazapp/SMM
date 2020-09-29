@@ -1,5 +1,6 @@
 package controlers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,7 +19,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-import utils.Screen;
 
 /**
  * FXML Controller class
@@ -32,7 +32,7 @@ public class LoginController implements Initializable {
 
     private final String TBO_COLOR = "512B58";
     private final String PPI_COLOR = "5050C8";
-    private final String VERSION = "2020.2.0";
+    private final String VERSION = "2020.3.0";
 
     private Alert alert;
     private Button button;

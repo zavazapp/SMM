@@ -109,7 +109,6 @@ public class DirectoryWatcher implements Runnable {
                     }
                 }
             }
-            CHANGING_FILE_NAME_ONLY = false;
 
             // Reset the key -- this step is critical if you want to
             // receive further watch events.  If the key is no longer valid,

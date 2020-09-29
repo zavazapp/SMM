@@ -64,7 +64,7 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Label layoutX="782.0" layoutY="6.0" onMouseClicked="#onCloseClick" prefHeight="17.0" prefWidth="10.0" text="X" textFill="RED" AnchorPane.bottomAnchor="179.0" AnchorPane.leftAnchor="782.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="4.0">
+      <Label layoutX="782.0" layoutY="6.0" onMouseClicked="#onMtNotificationCloseClick" prefHeight="17.0" prefWidth="10.0" text="X" textFill="RED" AnchorPane.bottomAnchor="179.0" AnchorPane.leftAnchor="782.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="4.0">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>

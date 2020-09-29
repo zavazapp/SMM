@@ -70,4 +70,18 @@ public class MasterPreferences {
     public void setDosijeiFolder(Path folder) {
     }
 
+    public Path getTicketsFolder() {
+        return null;
+    }
+
+    public void setTicketsFolder(Path path) {
+    }
+
+    public Path getPensionsFolder() {
+        return null;
+    }
+
+    public void setPensionsFolder(Path folder) {
+    }
+
 }

@@ -13,23 +13,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import models.MTMessages.MTEntity;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import preferences.TBOPreferences;
 import utils.AlertUtils;
 import utils.DateUtils;
@@ -58,6 +68,8 @@ public class T1Controller implements Initializable {
     private String ticketDate;
     private SimpleStringProperty sugestedMergeName = new SimpleStringProperty();
     private SimpleStringProperty sugestedDosijeLocation = new SimpleStringProperty();
+    private File dosijeFolder = new File(preferences.getDosijeiFolder().toString()); //root folder for archiving Dosije
+    private File archiveFolder;
 
     @FXML
     private TableView<T1Item> ticketsTable;
@@ -145,7 +157,7 @@ public class T1Controller implements Initializable {
         int spec = 0;
         switch (id) {
             case "tickets":
-                spec = 16;
+                spec = -1;
                 break;
             case "MT200":
                 spec = 0;
@@ -161,9 +173,9 @@ public class T1Controller implements Initializable {
                 break;
         }
 
-        if (spec < 8) {
-            fillTable(spec, tempDataReceived);
-            fillTable(spec + 1, tempDataSent);
+        if (spec != -1) {
+            fillTable(spec, tempDataSent);
+            fillTable(spec + 1, tempDataReceived);
         } else {
             fillTable(spec, tempTickets);
         }
@@ -173,10 +185,18 @@ public class T1Controller implements Initializable {
     private void fillTable(int spec, ObservableList<T1Item> list) {
         if (list != null) {
             list.clear();
-            File[] folderItems = preferences.getSpecificForder(spec).toFile().listFiles();
+            File[] folderItems;
+
+            if (spec != -1) {
+                folderItems = preferences.getSpecificForder(spec).toFile().listFiles();
+            } else {
+                folderItems = preferences.getTicketsFolder().toFile().listFiles();
+            }
 
             for (File folderItem : folderItems) {
-                T1Item item = new T1Item(folderItem.getName(), folderItem, preferences.getSpecificForder(spec).toFile().getName(), spec == 16 ? "ticket" : "mt");
+                T1Item item = new T1Item(folderItem.getName(), folderItem,
+                        spec != -1 ? preferences.getSpecificForder(spec).toFile().getName() : preferences.getTicketsFolder().toFile().getName(),
+                        spec == -1 ? "ticket" : "mt");
                 if (!itemIsInResult(item)) {
                     list.add(item);
                 }
@@ -219,7 +239,14 @@ public class T1Controller implements Initializable {
                 ticketDate = getTicketDate(clickedItem);
             }
 
-            if (clickedItem.getResFolderName().contains("MT202I")) {
+            if (clickedItem.getResFolderName().contains("MT202I")
+                    || clickedItem.getResFolderName().contains("MT202O")
+                    || clickedItem.getResFolderName().contains("MT200I")
+                    || clickedItem.getResFolderName().contains("MT200O")
+                    || clickedItem.getResFolderName().contains("MT300I")
+                    || clickedItem.getResFolderName().contains("MT300O")
+                    || clickedItem.getResFolderName().contains("MT320I")
+                    || clickedItem.getResFolderName().contains("MT320O")) {
                 try {
                     sugestedMergeName.set(clickedItem.getFileName().split("_")[2] + ".pdf");
                 } catch (ArrayIndexOutOfBoundsException exc) {
@@ -227,16 +254,52 @@ public class T1Controller implements Initializable {
                 }
             }
         }
+
+        if (evt.getButton().equals(MouseButton.SECONDARY)) {
+            
+            ContextMenu menu = new ContextMenu();
+            MenuItem item = new MenuItem("Show text");
+            item.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    String text = "";
+                    T1Item clickedItem = (T1Item) t.getSelectionModel().getSelectedItem();
+                    try {
+                        text = new FileUtils().readPdf(clickedItem.getFile());
+                    } catch (IOException ex) {
+                        Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                    Stage stage = new Stage();
+                    
+                    FXMLLoader loader = new FXMLLoader(T1Controller.class.getResource("/FXMLFiles/MtTextDisplay.fxml"));
+                    Scene newScene = null;
+                        try {
+                            newScene = new Scene(loader.load());
+                        } catch (IOException ex) {
+                            Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    
+                    MtTextDisplayController c = loader.getController();
+                    c.setText(text);
+                    stage.setScene(newScene);
+                    stage.show();
+                }
+            });
+
+            menu.getItems().add(item);
+            menu.show(tabPane.getScene().getWindow(), evt.getScreenX(), evt.getScreenY());
+        }
     }
 
     private File getDosijeArcFolder(T1Item clickedItem) throws IOException {
         String year = null;
         String month = null;
         String date = null;
+        dosijeFolder = preferences.getDosijeiFolder().toFile();
 
-        File archiveFolder = new File(preferences.getDosijeiFolder().toString()); //root folder for archiving Dosije
-        if (!archiveFolder.exists()) { //must be set in settings
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Destination folder not found", "Action aborted", "Destination folder does not exist: " + archiveFolder.getPath()).show();
+        if (!dosijeFolder.exists()) { //must be set in settings
+            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Destination folder not found", "Action aborted", "Destination folder does not exist: " + dosijeFolder.getPath()).show();
             return null;
         }
 
@@ -250,10 +313,10 @@ public class T1Controller implements Initializable {
                     + clickedItem.getFileName()
                     + "\n" + "Year set to: " + year).show();
         }
-        archiveFolder = new File(archiveFolder.getPath() + File.separator + year);
-        if (!archiveFolder.exists()) {
-            archiveFolder.mkdir();
-        }
+        dosijeFolder = new File(dosijeFolder.getPath() + File.separator + year);
+//        if (!archiveFolder.exists()) {
+//            archiveFolder.mkdir();
+//        }
 
         month = DateUtils.getMonthFromTicket(getTicketDate(clickedItem));
         if (month == null || month.equals("") || month.equals("NA")) {
@@ -266,10 +329,10 @@ public class T1Controller implements Initializable {
                     + "\n" + "Month set to: " + month).show();
         }
 
-        archiveFolder = new File(archiveFolder.getPath() + File.separator + month);
-        if (!archiveFolder.exists()) {
-            archiveFolder.mkdir();
-        }
+        dosijeFolder = new File(dosijeFolder.getPath() + File.separator + month);
+//        if (!archiveFolder.exists()) {
+//            archiveFolder.mkdir();
+//        }
 
         date = getTicketDate(clickedItem);
         if (date == null || date.equals("") || date.equals("NA")) {
@@ -282,13 +345,12 @@ public class T1Controller implements Initializable {
                     + "\n" + "Date set to: " + date).show();
         }
 
-        archiveFolder = new File(archiveFolder.getPath() + File.separator + date);
-        if (!archiveFolder.exists()) {
-            archiveFolder.mkdir();
-        }
-        return archiveFolder;
+        dosijeFolder = new File(dosijeFolder.getPath() + File.separator + date);
+//        if (!archiveFolder.exists()) {
+//            archiveFolder.mkdir();
+//        }
+        return dosijeFolder;
     }
-
 
     @FXML
     private void onResultTableRawClicked(MouseEvent evt) {
@@ -302,17 +364,27 @@ public class T1Controller implements Initializable {
     @FXML
     void onCreateClick() {
         notArchived = "";
+        mergedName = "";
         mergeUtil = new PDFMergerUtility();
         scene = tabPane.getScene();
         scene.setCursor(Cursor.WAIT);
         File destinFile = null;
 
-        mergedName = sugMergeLocTF.getText() + File.separator + sugMergeNameTF.getText();
+        mergedName = sugMergeLocTF.getText().trim() + File.separator + sugMergeNameTF.getText().trim();
+        dosijeFolder = new File(sugMergeLocTF.getText().trim());
+//        mergedName = sugMergeLocTF.getText() + File.separator + sugMergeNameTF.getText();
 
         Optional<ButtonType> result = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?\n"
                 + getList(dosijeData)).showAndWait();
 
         if (result.get() == ButtonType.OK) {
+            dosijeFolder.mkdirs();
+            if (!dosijeFolder.exists()) {
+                AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Error!", "Folder creation failed", "Can not create DOSIJE folder: " + dosijeFolder
+                        + "\nYou may not have access to folder: " + dosijeFolder);
+                return;
+            }
+
             destinFile = new File(mergedName);
             mergeUtil.setDestinationFileName(mergedName);
 
@@ -328,14 +400,14 @@ public class T1Controller implements Initializable {
                 mergeUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
                 if (destinFile.exists()) {
                     archiveFiles(dosijeData);
-                }else{
+                } else {
                     AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Merge not completed", "Action aborted", "Selected files not archived. Try again.").show();
                     resetDosijeLocAndName();
                     return;
                 }
-                
+
                 Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Merge completed", "Merge completed", "Merge file saved on " + destinFile.getPath()
-                        +  "\n\n"
+                        + "\n\n"
                         + "Archived files: \n" + getList(dosijeData) + "\n"
                         + (notArchived.isEmpty() ? "" : ("Please review. There are not archived files:\n" + notArchived)));
                 a.getButtonTypes().add(0, new ButtonType("Open file"));
@@ -369,26 +441,9 @@ public class T1Controller implements Initializable {
         return mergedName;
     }
 
-//    private File getResultFile() {
-//        File rf = null;
-//
-//        rf = new File(preferences.getDosijeiFolder().toString());
-//        if (!rf.exists()) {
-//            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Destination folder not found", "Action aborted", "Destination folder does not exist: " + rf.getPath());
-//            return null;
-//        }
-//
-//        rf = new File(rf.getPath() + File.separator + Calendar.getInstance().get(Calendar.YEAR));
-//        if (!rf.exists()) {
-//            rf.mkdir();
-//        }
-//
-//        return rf;
-//    }
-
     private void archiveFiles(ObservableList<T1Item> finalData) {
         MTEntity mt = null;
-        File archiveFolder = null;
+        archiveFolder = null;
         int result;
         for (T1Item t1Item : finalData) {
             archiveFolder = getArchiveFolder(t1Item);
@@ -413,7 +468,6 @@ public class T1Controller implements Initializable {
         }
     }
 
-
     private static String getTicketDate(T1Item t1Item) {
         String ticketDate = "NA";
         if (t1Item.getType().equals("ticket") && t1Item.getFileName().split("_").length > 2 && t1Item.getFileName().split("_")[3].length() > 10) {
@@ -427,8 +481,8 @@ public class T1Controller implements Initializable {
     }
 
     private File getArchiveFolder(T1Item t1Item) {
-        File archiveFolder;
-        File archiveRoot = new File(t1Item.getFile().getParentFile().getParent() + File.separator + "MT_arhiva/");
+        archiveFolder = null;
+        File archiveRoot = new File(preferences.getRoot() + File.separator + "MT_arhiva/");
         if (!archiveRoot.exists()) {
             archiveRoot.mkdir();
         }
@@ -470,8 +524,9 @@ public class T1Controller implements Initializable {
     }
 
     private void bindInfo() {
-        sugMergeNameTF.textProperty().bind(sugestedMergeName);
-        sugMergeLocTF.textProperty().bind(sugestedDosijeLocation);
+        sugMergeNameTF.textProperty().bindBidirectional(sugestedMergeName);
+        sugMergeLocTF.textProperty().bindBidirectional(sugestedDosijeLocation);
+
     }
 
     private boolean itemIsInResult(T1Item item) {
@@ -488,6 +543,9 @@ public class T1Controller implements Initializable {
     }
 
     private void resetDosijeLocAndName() {
+        sugMergeNameTF.clear();
+        sugMergeLocTF.clear();
+
         sugestedDosijeLocation.set(null);
         sugestedMergeName.set(null);
     }

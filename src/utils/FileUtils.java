@@ -275,7 +275,6 @@ public class FileUtils {
 //
 //        return counter;
 //    }
-
     /**
      * Checks if file is renamed to prevent user to archive not renamed files
      *
@@ -619,4 +618,18 @@ public class FileUtils {
 
         return newFile;
     }
+
+    public String readPdf(File file) throws IOException {
+        String text = "Can not read file !";
+        try (PDDocument doc = PDDocument.load(file)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            text = stripper.getText(doc).trim();
+            doc.close();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return text;
+    }
+
 }

@@ -59,22 +59,22 @@ public class SettingsController implements Initializable {
             preferences = PPIPreferences.getInstance(getClass());
             items.add(new SettingsItem("PPI_ROOT", preferences.getRoot().toString()));
             items.add(new SettingsItem("TBO_DIR", preferences.getSendDir().toString()));
+            items.add(new SettingsItem("PENSIONS_DIR", preferences.getPensionsFolder().toString()));
             for (String s : preferences.getFOLDERS()) {
                 items.add(new SettingsItem(s, preferences.getSpecificForder(Arrays.asList(preferences.getFOLDERS()).indexOf(s)).toString()));
             }
-
         }
 
         if (LoginController.MODE.equals("TBO")) {
             preferences = TBOPreferences.getInstance(getClass());
-            items.add(new SettingsItem("TBO_ROOT", preferences.getRoot().toString()));
-            items.add(new SettingsItem("TBO_DOSIJEI", preferences.getDosijeiFolder().toString()));
-            items.add(new SettingsItem("PPI_DIR", preferences.getSendDir().toString()));
+            items.add(new SettingsItem("TBO_ROOT", preferences.getRoot().toString())); //case 0
+            items.add(new SettingsItem("TBO_DOSIJEI", preferences.getDosijeiFolder().toString())); //case 1
+            items.add(new SettingsItem("TBO_TICKETS", preferences.getTicketsFolder().toString())); //case 2
+            items.add(new SettingsItem("PPI_DIR", preferences.getSendDir().toString())); //case 3
             for (String s : preferences.getFOLDERS()) {
                 items.add(new SettingsItem(s, preferences.getSpecificForder(Arrays.asList(preferences.getFOLDERS()).indexOf(s)).toString()));
             }
         }
-
         data = table.getItems();
         data.addAll(items);
     }
@@ -88,16 +88,24 @@ public class SettingsController implements Initializable {
             File fromChooser = openFileChooser(clickedItem.getPath());
             if (fromChooser != null) {
                 clickedItem.setPath(fromChooser.getPath());
-                switch (index) {
-                    case 0:
+                switch (clickedItem.getName()) {
+                    case "PPI_ROOT":
+                    case "TBO_ROOT":
                         preferences.setRoot(fromChooser.toPath());
                         setTableData();
                         break;
-                    case 1:
+                    case "TBO_DOSIJEI":
                         preferences.setDosijeiFolder(fromChooser.toPath());
                         break;
-                    case 2:
+                    case "TBO_TICKETS":
+                        preferences.setTicketsFolder(fromChooser.toPath());
+                        break;
+                    case "TBO_DIR":
+                    case "PPI_DIR":
                         preferences.setSendDir(fromChooser.toPath());
+                        break;
+                    case "PENSIONS_DIR":
+                        preferences.setPensionsFolder(fromChooser.toPath());
                         break;
                     default:
                         preferences.setSpecificFolder(clickedItem.getName(), fromChooser.toPath());

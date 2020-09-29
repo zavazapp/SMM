@@ -23,11 +23,12 @@ public class PPIPreferences extends MasterPreferences {
     //default folders
     private final String PPI_ROOT = "\\\\sftp\\PPI\\MT_SWIFT";
     // private final String PPI_ROOT = "C:\\Users\\Korisnik\\Desktop\\MT_PPI\\MT_SWIFT";
-    private final String TBO_DIR = "\\\\sftp\\tbo";
+    private final String TBO_DIR = "\\\\sftp\\tbo\\MT_SWIFT";
+    private final String PENSIONS_DIR = "\\\\sftp\\PPI\\Spiskovi za penzije\\ZAHTEVI ZA POVRACAJ PENZIJA";
     //  private final String TBO_DIR = "C:\\Users\\Korisnik\\Desktop\\MT_TBO";
     //folders available in navigation menu
     private final List<String> AVAILABLE_TBO_FOLDERS = Arrays.asList("MT202I", "MT202O", "MT199I", "MT199O", "MT299I", "MT299O", "MT999I", "MT999O");
-    private final String[] PPI_FOLDERS = new String[]{"MT192I", "MT192O", "MT195I", "MT195O", "MT196I", "MT196O", "MT199I", "MT199O", "MT202I", "MT202O", "MT299I", "MT299O", "MT999I", "MT999O", "Zahtevi za povracaj"};
+    private final String[] PPI_FOLDERS = new String[]{"MT192I", "MT192O", "MT195I", "MT195O", "MT196I", "MT196O", "MT199I", "MT199O", "MT202I", "MT202O", "MT299I", "MT299O", "MT999I", "MT999O"};
     //default value of observers
     private final boolean[] PPI_STATUSES = new boolean[]{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
     //TODO - not implemented yet. Idea is to rename file automaticly
@@ -137,12 +138,23 @@ public class PPIPreferences extends MasterPreferences {
 
     @Override
     public boolean getObserverStatus() {
-        return preferences.getBoolean("observer_status", false);
+        return preferences.getBoolean("observer_status", true);
     }
 
     @Override
     public void setObserverStatus(boolean status) {
         preferences.putBoolean("observer_status", status);
+    }
+    
+    
+    @Override
+    public void setPensionsFolder(Path path) {
+        preferences.put("PENSIONS_DIR", path.toString());
+    }
+
+    @Override
+    public Path getPensionsFolder() {
+        return Paths.get(preferences.get("PENSIONS_DIR", PENSIONS_DIR));
     }
 
     public double getFont() {
@@ -158,7 +170,9 @@ public class PPIPreferences extends MasterPreferences {
     public void resetPreferencesToDefault() {
         setRoot(Paths.get(PPI_ROOT));
         setSendDir(Paths.get(TBO_DIR));
+        setPensionsFolder(Paths.get(PENSIONS_DIR));
         setPPIAutoRename(false);
+        setObserverStatus(true);
         resetPPIRoot(PPI_ROOT);
     }
 

@@ -35,7 +35,8 @@ public class NotificationController implements Initializable, IOnFileReceived {
     private final FileUtils fileUtils = new FileUtils();
 
     public static Stage stage;
-    public static NotificationModel notification;
+    public static NotificationModel mtNotification;
+    public static NotificationModel ticketNotification;
     public static MTEntity clickedRow;
 
     @FXML
@@ -52,10 +53,10 @@ public class NotificationController implements Initializable, IOnFileReceived {
 
     @Override
     public void onFileReceived(Path root, Path filePath) {
-        if (!root.toString().contains("TIKETI")) {
-            if (notification == null) {
+        if (!root.toString().contains("Tiketi")) {
+            if (mtNotification == null) {
                 try {
-                    notification = new NotificationModel(
+                    mtNotification = new NotificationModel(
                             new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/Notification.fxml")),
                             new Stage(StageStyle.TRANSPARENT)
                     );
@@ -63,8 +64,11 @@ public class NotificationController implements Initializable, IOnFileReceived {
                     Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            if (!notification.isShowing()) {
-                notification.show();
+            if (!mtNotification.isShowing()) {
+                mtNotification.show();
+                if (ticketNotification != null && ticketNotification.isShowing() && ticketNotification.isMovedDown()) {
+                    ticketNotification.moveDown();
+                }
             }
 
             try {
@@ -73,24 +77,35 @@ public class NotificationController implements Initializable, IOnFileReceived {
                 Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            try {
-                notification = new NotificationModel(
-                        new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/TicketNotification.fxml")),
-                        new Stage(StageStyle.TRANSPARENT)
-                );
-                notification.show();
-            } catch (IOException ex) {
-                Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+            if (ticketNotification == null) {
+                try {
+                    ticketNotification = new NotificationModel(
+                            new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/TicketNotification.fxml")),
+                            new Stage(StageStyle.TRANSPARENT)
+                    );
+                } catch (IOException ex) {
+                    Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-
+            if (!ticketNotification.isShowing()) {
+                ticketNotification.show();
+            }
         }
-
     }
 
     @FXML
-    private void onCloseClick() {
-        notification.hide();
-        notification = null;
+    private void onMtNotificationCloseClick() {
+        if (mtNotification != null) {
+            mtNotification.hide();
+        }
+        mtNotification = null;
+    }
+    @FXML
+      private void onTicketNotificationCloseClick() {
+        if (ticketNotification != null) {
+            ticketNotification.hide();
+        }
+        ticketNotification = null;
     }
 
     public void setData(Path root, Path filePath) throws IOException {

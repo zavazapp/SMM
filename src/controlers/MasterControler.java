@@ -230,7 +230,6 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     }
 
     private void invalidateData(LocalDate newValue) {
-
         if (currentSelectionLabel != null) {
             d.setData(mtdao.getObservableList(preferences.getRoot(), java.sql.Date.valueOf(newValue), currentSelectionLabel.getId(), d.isLive()));
         }
@@ -240,7 +239,6 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         new Runnable() {
             @Override
             public void run() {
-
                 tableData.clear();
                 for (MTEntity mTEntity : d.getData()) {
                     tableData.add(mTEntity);
@@ -279,7 +277,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             private void invalidateNavLabels() {
 
                 Platform.runLater(() -> {
-                    for (int i = 0; i < d.getNavLabels().length - 1; i++) {
+                    for (int i = 0; i < d.getNavLabels().length; i++) {
                         count = mtdao.getCount(Paths.get(preferences.getRoot().toString(), preferences.getFOLDERS()[i]), java.sql.Date.valueOf(datePicker.getValue()), d.isLive());
                         if (d.getNavLabels()[i].getText().contains("Sent")) {
                             labelText = "Sent";
@@ -480,7 +478,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                 Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-//        CHANGING_FILE_NAME_ONLY = false;
+        CHANGING_FILE_NAME_ONLY = false;
         scene.setCursor(Cursor.DEFAULT);
 
         //inform user about action completion
@@ -513,7 +511,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         //check if it is pension (defined in clicked button name property)
         String name = ((Button) (evt.getSource())).getId();
         if (name != null && name.equals("pension")) {
-            archiveFolder = preferences.getSpecificForder(14).toFile();
+            archiveFolder = preferences.getPensionsFolder().toFile();
             isPension = true;
         } else {
             //create archive folders
@@ -701,7 +699,10 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                     }
 
                 }
-
+                if (preferences.getTicketsFolder().toFile().exists()) {
+                    dirs.add(preferences.getTicketsFolder());
+                }
+                
                 DirectoryWatcher watcher = new DirectoryWatcher(dirs);
                 return null;
             }
