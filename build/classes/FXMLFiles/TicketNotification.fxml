@@ -6,12 +6,12 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlers.NotificationController">
    <children>
-      <Label alignment="CENTER" prefHeight="200.0" prefWidth="400.0" styleClass="tboDark" stylesheets="@../resources/smm_stylesheet.css" text="New tickets received" textFill="WHITE">
+      <Label alignment="CENTER" prefHeight="100.0" prefWidth="350.0" styleClass="tboDark" stylesheets="@../resources/smm_stylesheet.css" text="New tickets received" textFill="WHITE">
          <font>
             <Font size="34.0" />
          </font>
       </Label>
-      <Label layoutX="370.0" layoutY="7.0" onMouseClicked="#onTicketNotificationCloseClick" prefHeight="17.0" prefWidth="10.0" text="X" textFill="RED">
+      <Label layoutX="328.0" onMouseClicked="#onTicketNotificationCloseClick" prefHeight="17.0" prefWidth="10.0" text="X" textFill="RED">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>

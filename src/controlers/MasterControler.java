@@ -1,6 +1,9 @@
 package controlers;
 
 import Tools.DirectoryWatcher;
+import Tools.IOnFileReceived;
+import Tools.IOnFileReceived2;
+import Tools.IOnResetWatcher;
 import static controlers.LoginController.MODE;
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +18,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -49,25 +54,32 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import models.MTMessages.MTDAO;
 import models.MTMessages.MTEntity;
+import org.apache.pdfbox.debugger.ui.RotationMenu;
 import preferences.PPIPreferences;
 import preferences.TBOPreferences;
 import utils.AlertUtils;
 import utils.FileUtils;
 
-public class MasterControler implements Initializable, ListChangeListener<MTEntity> {
+public class MasterControler implements Initializable, ListChangeListener<MTEntity>, IOnFileReceived2, IOnResetWatcher {
 
+    // <editor-fold defaultstate="collapsed" desc="user-description">
     public static boolean CHANGING_FILE_NAME_ONLY;
     public static boolean OBSERVE_ON;
-    private DisplayDataModel d;
-    private preferences.MasterPreferences preferences;
+    private static DisplayDataModel d;
+    private static preferences.MasterPreferences preferences;
     private final MTDAO mtdao = new MTDAO();
     private Label previousSelectionLabel;
     private Label currentSelectionLabel;
     private ObservableList<MTEntity> tableData;
     private FileUtils fileUtils;
     private Stage stage;
+    private final IOnFileReceived notificationControler = new NotificationController();
+    private static DirectoryWatcher watcher;
+    private static final SimpleIntegerProperty ticketsCount2 = new SimpleIntegerProperty();
+    private RotateTransition rotateTransition;
 
     @FXML
     private DatePicker datePicker;
@@ -84,6 +96,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     @FXML
     private Label masterCount;
     @FXML
+    private Label ticketsCount;
+    @FXML
     private Label completeLabel;
     @FXML
     private Label lastSelectionDisplay;
@@ -99,6 +113,9 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private Button pensionButon;
     @FXML
     private Button sendButton;
+    @FXML
+    private Label refreshLabel;
+    // </editor-fold>
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -116,11 +133,16 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         setRawPaintPolicy();
         setSettingsListener();
         OBSERVE_ON = preferences.getObserverStatus();
+        rotateTransition = new RotateTransition(Duration.millis(2000), refreshLabel);
+        rotateTransition.setByAngle(360);
 
         if (OBSERVE_ON) {
             setDirectoryWatchers();
         }
-
+        if (MODE.equals("TBO")) {
+            ticketsCount2.set(mtdao.getTicketCount(preferences.getTicketsFolder()));
+            ticketsCount.textProperty().bind(ticketsCount2.asString());
+        }
     }
 
     private void createDisplayObject() {
@@ -135,6 +157,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             d = new PPIDisplayDataModel(
                     true,
                     mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), new Date(System.currentTimeMillis()), true),
+                    0,
                     LocalDate.now(),
                     mtdao.getObservableList(preferences.getRoot(), new Date(System.currentTimeMillis()), "", true),
                     null, null, null, null
@@ -146,7 +169,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             preferences = TBOPreferences.getInstance(getClass());
             d = new TBODisplayDataModel(
                     true,
-                    mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), new Date(System.currentTimeMillis()), true),
+                    mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), new Date(System.currentTimeMillis()), true), // mt messages
+                    mtdao.getTicketCount(preferences.getTicketsFolder()), // tickets
                     LocalDate.now(),
                     mtdao.getObservableList(preferences.getRoot(), new Date(System.currentTimeMillis()), "", true),
                     null, null, null
@@ -222,8 +246,11 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     }
 
     private void invalidateCount(LocalDate newValue) {
-        int count = mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), java.sql.Date.valueOf(newValue), d.isLive());
         d.setTotalCount(mtdao.getMasterCount(preferences.getRoot(), preferences.getFOLDERS(), java.sql.Date.valueOf(newValue), d.isLive()));
+        if (MODE.equals("TBO")) {
+            d.setTicketCount(mtdao.getTicketCount(preferences.getTicketsFolder()));
+            ticketsCount2.set(mtdao.getTicketCount(preferences.getTicketsFolder()));
+        }
 
         masterCount.setText(String.valueOf(d.getTotalCount()));
         completeLabel.setVisible(d.getTotalCount() == 0);
@@ -438,6 +465,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private void onRenameClicked() {
         CHANGING_FILE_NAME_ONLY = true; //custom handling of avoidance to notification display on rename
         ObservableList<Integer> selectedIndices = table.getSelectionModel().getSelectedIndices();
+        d.setData(table.getItems());
+
         int counter = 0; //number of renamed files - adds if fileRename methods return true or !=null
 
         //check how meny msgs. are selected
@@ -489,6 +518,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     @FXML
     private void onArchiveClick(MouseEvent evt) {
         ObservableList<Integer> selectedIndices = table.getSelectionModel().getSelectedIndices();
+        d.setData(table.getItems());
 
         //check selection
         if (selectedIndices.isEmpty()) {
@@ -683,15 +713,19 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             if (SettingsController.OBSERVER_STATUS.get()) {
                 setDirectoryWatchers();
             } else {
-                DirectoryWatcher.closeWatcher();
+
             }
         });
     }
 
     private void setDirectoryWatchers() {
+
+        if (!OBSERVE_ON || watcher != null) {
+            watcher.closeWatcher();
+        }
         Task t = new Task() {
             @Override
-            protected Object call() throws Exception {
+            protected Object call() {
                 ArrayList<Path> dirs = new ArrayList<>();
                 for (int i = 0; i < preferences.getFOLDERS().length; i++) {
                     if (preferences.getSpecificForder(i).toFile().exists() && !preferences.getSpecificForder(i).equals(preferences.getDosijeiFolder())) {
@@ -699,14 +733,57 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                     }
 
                 }
-                if (preferences.getTicketsFolder().toFile().exists()) {
+                if (MODE.equals("TBO") && preferences.getTicketsFolder().toFile().exists()) {
                     dirs.add(preferences.getTicketsFolder());
                 }
-                
-                DirectoryWatcher watcher = new DirectoryWatcher(dirs);
+
+                try {
+                    watcher = new DirectoryWatcher(dirs);
+                } catch (IOException ex) {
+                    Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 return null;
             }
         };
         new Thread(t).start();
+    }
+
+    @Override
+    public void onFileReceived(Path root, Path path) {
+        Platform.runLater(() -> {
+            if (countChanged(root)) {
+                notificationControler.onFileReceived(root, path);
+                if (MODE.equals("TBO")) {
+                    ticketsCount2.set(mtdao.getTicketCount(preferences.getTicketsFolder()));
+                }
+            }
+        });
+
+    }
+
+    private boolean countChanged(Path root) {
+        int oldCount = 0;
+        int newCount = mtdao.getCount(root, new java.sql.Date(System.currentTimeMillis()), true);
+        String labelText;
+        for (int i = 0; i < d.getNavLabels().length; i++) {
+            labelText = d.getNavLabels()[i].getText();
+            if (root.toString().contains(d.getNavLabels()[i].getId())) {
+                oldCount = Integer.parseInt(labelText.substring(labelText.indexOf("(") + 1, labelText.indexOf(")")));
+            }
+        }
+        return oldCount < newCount;
+    }
+
+    @Override
+    public void resetWatcher() {
+        setDirectoryWatchers();
+    }
+
+    @FXML
+    private void onRefreshClick() {
+        invalidateOnSeparateThread(LocalDate.now());
+        invalidateCount(LocalDate.now());
+        rotateTransition.play();
+
     }
 }

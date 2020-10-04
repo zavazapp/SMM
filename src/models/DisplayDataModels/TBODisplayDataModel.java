@@ -11,8 +11,8 @@ import models.MTMessages.MTEntity;
  */
 public class TBODisplayDataModel extends DisplayDataModel {
 
-    public TBODisplayDataModel(boolean live, int totalCount, LocalDate date, ObservableList<MTEntity> data, Button renameButton, Button archiveButton, Button sendButton) {
-        super(live, totalCount, date, data, renameButton, archiveButton, sendButton);
+    public TBODisplayDataModel(boolean live, int totalCount, int ticketCount, LocalDate date, ObservableList<MTEntity> data, Button renameButton, Button archiveButton, Button sendButton) {
+        super(live, totalCount, ticketCount, date, data, renameButton, archiveButton, sendButton);
     }
 
 }

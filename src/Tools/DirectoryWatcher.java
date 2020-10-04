@@ -1,7 +1,6 @@
 package Tools;
 
 import controlers.MasterControler;
-import controlers.NotificationController;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -18,9 +17,8 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.application.Platform;
 import static controlers.MasterControler.CHANGING_FILE_NAME_ONLY;
-import controlers.SettingsController;
+import models.MTMessages.MTDAO;
 
 /**
  * This class sets watchers on directories that are checked in settings to
@@ -30,11 +28,14 @@ import controlers.SettingsController;
  */
 public class DirectoryWatcher implements Runnable {
 
-    public static WatchService watcher;
+    public WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private ArrayList<Path> dirs;
     static Path filename;
-    private final IOnFileReceived notificationControler = new NotificationController();
+    private final IOnFileReceived2 masterControler = new MasterControler();
+    private final IOnResetWatcher onResetWatcher = new MasterControler();
+    private final MTDAO mtdao = new MTDAO();
+    private Path[] paths;
 
     public DirectoryWatcher(ArrayList<Path> dirs) throws IOException {
 
@@ -43,9 +44,12 @@ public class DirectoryWatcher implements Runnable {
         this.keys = new HashMap<>();
         register(dirs);
         startNewThread(); //run watcher on saeparate thread
+        
     }
 
     private void register(ArrayList<Path> dir) {
+        paths = new Path[dir.size()];
+        paths = dir.toArray(paths);
         for (Path path : dir) {
             WatchKey key = null;
             try {
@@ -77,7 +81,11 @@ public class DirectoryWatcher implements Runnable {
             Path dir = keys.get(key);
             if (dir == null) {
                 System.err.println("WatchKey not recognized!!");
-                continue;
+                resetWatcher();
+                if (dir == null) {
+                    return;
+                }
+                return;
             }
 
             //loop stops here and waith for event
@@ -101,11 +109,7 @@ public class DirectoryWatcher implements Runnable {
                 if (kind == StandardWatchEventKinds.ENTRY_CREATE
                         && filename.getFileName().toString().endsWith(".pdf")) {
                     if (!CHANGING_FILE_NAME_ONLY) {
-                        System.out.println(filename);
-                        Platform.runLater(() -> {
-                            notificationControler.onFileReceived(keys.get(key), filename);
-                        });
-                        
+                            masterControler.onFileReceived(keys.get(key), filename);
                     }
                 }
             }
@@ -131,7 +135,7 @@ public class DirectoryWatcher implements Runnable {
             }
         }
     }
-
+    
     private void startNewThread() {
         Thread t = new Thread(this);
         t.setDaemon(true);
@@ -140,21 +144,22 @@ public class DirectoryWatcher implements Runnable {
 
     }
 
-    public static void closeWatcher() {
+    public void closeWatcher() {
         if (watcher != null) {
             try {
                 watcher.close();
-                System.err.println("Observer STOPED");
             } catch (IOException ex) {
                 Logger.getLogger(DirectoryWatcher.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            System.err.println("Observer STOPED");
             setStatus(false);
         }
     }
 
     //Makes watcher globaly available mainly for stoping watcher when needed
     //TODO may not need this
-    public static WatchService getWatcher() {
+    public WatchService getWatcher() {
         return watcher;
     }
 
@@ -169,5 +174,12 @@ public class DirectoryWatcher implements Runnable {
 //
 //        }
     }
+
+    private void resetWatcher() {
+        closeWatcher();
+        onResetWatcher.resetWatcher();
+    }
+    
+    
 
 }

@@ -14,6 +14,7 @@ public class DisplayDataModel {
 
     public boolean live; //is data from live folder or from archive
     public int totalCount; //number of messages in choosen folder
+    public int ticketCount; //number of messages in choosen folder
     public LocalDate date; //choosen date
     public ObservableList<MTEntity> data;
     public Label[] navLabels;
@@ -22,9 +23,10 @@ public class DisplayDataModel {
     public Button archiveButton;
     public Button sendButton;
 
-    public DisplayDataModel(boolean live, int totalCount, LocalDate date, ObservableList<MTEntity> data, Button renameButton, Button archiveButton, Button sendButton) {
+    public DisplayDataModel(boolean live, int totalCount, int ticketCount, LocalDate date, ObservableList<MTEntity> data, Button renameButton, Button archiveButton, Button sendButton) {
         this.live = live;
         this.totalCount = totalCount;
+        this.ticketCount = ticketCount;
         this.date = date;
         this.data = data;
         this.renameButton = renameButton;
@@ -95,6 +97,13 @@ public class DisplayDataModel {
     public void setNavLabels(Label[] navLabels) {
         this.navLabels = navLabels;
     }
-    
-    
+
+    public int getTicketCount() {
+        return ticketCount;
+    }
+
+    public void setTicketCount(int ticketCount) {
+        this.ticketCount = ticketCount;
+    }
+
 }

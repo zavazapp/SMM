@@ -316,6 +316,19 @@ public class FileUtils {
                 return "NA";
             }
 
+        } else if (type.equals("ticket")) {
+                try {
+                    startIndex = text.lastIndexOf("  VAL ") + 6;
+                    if (startIndex == -1) {
+                        startIndex = text.lastIndexOf("#  VAL ") + 7;
+                    }
+                    endIndex = 9;
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    return "NA";
+                }
+
+            
         } else {
             try {
                 tempStartIndex = text.lastIndexOf("Date");
@@ -333,6 +346,9 @@ public class FileUtils {
         }
 
         String temp = text.substring(startIndex, startIndex + endIndex);
+        if (type.equals("ticket")) {
+            temp = temp.concat("ticket").trim();
+        }
 
         return DateUtils.getFormatedDate(temp.trim());
     }
@@ -630,6 +646,10 @@ public class FileUtils {
             System.out.println(e.getMessage());
         }
         return text;
+    }
+
+    public String getTicketDate(String text) {
+        return getDate(text, "ticket");
     }
 
 }

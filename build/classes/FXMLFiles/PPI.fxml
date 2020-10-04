@@ -4,6 +4,7 @@
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -140,6 +141,14 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                     </HBox.margin>
                     <children>
+                  <Label fx:id="refreshLabel" layoutX="129.0" layoutY="-1.0" onMouseClicked="#onRefreshClick" prefHeight="17.0" prefWidth="14.0" text="↻" textFill="WHITE">
+                     <font>
+                        <Font size="21.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Label>
                         <ImageView layoutX="28.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="@../resources/Transfer-files2.png" />

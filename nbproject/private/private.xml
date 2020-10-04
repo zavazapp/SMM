@@ -2,6 +2,15 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/utils/Dosije.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/utils/DateUtils.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/controlers/SettingsController.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/preferences/MasterPreferences.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/preferences/TBOPreferences.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/utils/FileUtils.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/models/TicketEntity.java</file>
+            <file>file:/C:/Users/Korisnik/Documents/NetBeansProjects/SMM_Plus/src/controlers/T1Controller.java</file>
+        </group>
     </open-files>
 </project-private>

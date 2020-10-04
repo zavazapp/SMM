@@ -61,10 +61,10 @@ public class MTDAO {
                 public void run() {
                     if (list == null) {
                         list = new ArrayList<>();
-                    }else{
+                    } else {
                         list.clear();
                     }
-                    
+
                     for (File file : observedDir.listFiles()) {
                         MTEntity mt;
 
@@ -104,9 +104,9 @@ public class MTDAO {
             c.setTime(date);
 
             String stringPath = path.toString();
-            
-            String specFolder = stringPath.substring(stringPath.length()-6, stringPath.length());
-            
+
+            String specFolder = stringPath.substring(stringPath.length() - 6, stringPath.length());
+
             String archivePath = path.toFile().getParentFile().getPath() + File.separator
                     + "MT_arhiva" + File.separator
                     + c.get(Calendar.YEAR) + File.separator
@@ -136,10 +136,22 @@ public class MTDAO {
         return masterCount;
     }
 
+    public int getMasterCount(Path root, Path[] folders, Date date, boolean isLive) {
+        int masterCount = 0;
+        for (Path folder : folders) {
+            masterCount += getCount(Paths.get(root.toString(), folder.toString()), date, isLive);
+        }
+        return masterCount;
+    }
+
     public ObservableList<MTEntity> getObservableList(Path ppiRoot, Date date, String currentSelection, boolean isLive) {
         this.observableList = FXCollections.observableArrayList(getAll(ppiRoot, date, currentSelection, isLive));
         return observableList;
-        
+
+    }
+
+    public int getTicketCount(Path path) {
+        return getCountFor(path);
     }
 
 }

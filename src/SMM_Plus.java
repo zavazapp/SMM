@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -25,7 +26,9 @@ public class SMM_Plus extends Application {
         Scene scene = new Scene(root);
 //        scene.setFill(null);
         stage.setScene(scene);
-       
+        
+        //set taskbar icon
+        stage.getIcons().add(new Image(this.getClass().getResourceAsStream("resources/taskbar_icon.png")));
         stage.show();
         stage.setOnCloseRequest((WindowEvent e) -> {
             Platform.exit();

@@ -54,7 +54,6 @@ public class MtTextDisplayController implements Initializable {
     @FXML
     private void onMouseClicked(MouseEvent evt) {
         String buttonName = ((Button)evt.getSource()).getId();
-        System.out.println(buttonName);
         switch (buttonName) {
             case "close":
                 Stage s = (Stage) textArea.getScene().getWindow();

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Optional;
@@ -12,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -24,8 +27,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -35,14 +38,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.scene.control.DatePicker;
 import models.MTMessages.MTEntity;
+import models.TicketEntity;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import preferences.TBOPreferences;
 import utils.AlertUtils;
 import utils.DateUtils;
+import utils.Dosije;
 import utils.FileUtils;
 
 /**
@@ -58,7 +62,8 @@ public class T1Controller implements Initializable {
     private final FileUtils fileUtils = new FileUtils();
     private ObservableList<T1Item> tempDataReceived;
     private ObservableList<T1Item> tempDataSent;
-    private ObservableList<T1Item> dosijeData;
+    private ObservableList<T1Item> tempDosijeData;
+    private ObservableList<T1Item> resultData;
     private String[] availableFolders;
     private HashMap<String, TableView> tables;
     private Scene scene;
@@ -66,10 +71,12 @@ public class T1Controller implements Initializable {
     private String mergedName;
     private String notArchived;
     private String ticketDate;
-    private SimpleStringProperty sugestedMergeName = new SimpleStringProperty();
     private SimpleStringProperty sugestedDosijeLocation = new SimpleStringProperty();
     private File dosijeFolder = new File(preferences.getDosijeiFolder().toString()); //root folder for archiving Dosije
     private File archiveFolder;
+    private TicketEntity ticket;
+    private static Dosije dosije;
+    private ObservableList<String> comboList;
 
     @FXML
     private TableView<T1Item> ticketsTable;
@@ -102,6 +109,9 @@ public class T1Controller implements Initializable {
     private TableView<T1Item> resultTable;
 
     @FXML
+    private TableView<T1Item> dosijeiTable;
+
+    @FXML
     private Button createButton;
 
     @FXML
@@ -111,18 +121,25 @@ public class T1Controller implements Initializable {
     private SplitPane rootPane;
 
     @FXML
-    private TextField sugMergeNameTF;
+    private ComboBox sugestedFileNameCombo;
 
     @FXML
     private TextField sugMergeLocTF;
+
+    @FXML
+    private DatePicker datePicker;
     //</editor-fold>
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dosijeData = resultTable.getItems();
+        datePicker.setValue(LocalDate.now());
+        dosije = new Dosije();
+        resultData = resultTable.getItems();
+        comboList = sugestedFileNameCombo.getItems();
         setHashMapOfTables();
         availableFolders = preferences.getFOLDERS();
         bindInfo();
+        addDatePickerValueChangeListener();
     }
 
     //when user select tab
@@ -149,6 +166,8 @@ public class T1Controller implements Initializable {
         if (id.equals("tickets")) {
             tempTickets = tables.get("tickets").getItems();
 
+        } else if (id.equals("dosijei")) {
+            tempDosijeData = tables.get("dosijei").getItems();
         } else {
             tempDataReceived = tables.get(id + "O").getItems();
             tempDataSent = tables.get(id + "I").getItems();
@@ -158,6 +177,9 @@ public class T1Controller implements Initializable {
         switch (id) {
             case "tickets":
                 spec = -1;
+                break;
+            case "dosijei":
+                spec = -2;
                 break;
             case "MT200":
                 spec = 0;
@@ -171,32 +193,55 @@ public class T1Controller implements Initializable {
             case "MT320":
                 spec = 6;
                 break;
+
         }
 
-        if (spec != -1) {
+        if (spec == -1) {
+            fillTable(spec, tempTickets);
+        } else if (spec == -2) {
+            fillTable(spec, tempDosijeData);
+        } else {
             fillTable(spec, tempDataSent);
             fillTable(spec + 1, tempDataReceived);
-        } else {
-            fillTable(spec, tempTickets);
         }
+
     }
 
     //adds items to observable lists and table data updates
     private void fillTable(int spec, ObservableList<T1Item> list) {
+        String resFolderName;
+        String type;
+
         if (list != null) {
             list.clear();
             File[] folderItems;
 
-            if (spec != -1) {
-                folderItems = preferences.getSpecificForder(spec).toFile().listFiles();
-            } else {
+            if (spec == -1) {
                 folderItems = preferences.getTicketsFolder().toFile().listFiles();
+                resFolderName = preferences.getTicketsFolder().toFile().getName();
+                type = "ticket";
+            } else if (spec == -2) {
+                String path = preferences.getDosijeiFolder().toString() + File.separator
+                        + datePicker.getValue().getYear() + File.separator
+                        + datePicker.getValue().getMonthValue() + File.separator
+                        + DateUtils.getFormatedDate(datePicker.getValue());
+
+                folderItems = Paths.get(path).toFile().listFiles();
+                if (folderItems == null) {
+                    folderItems = new File[0];
+                }
+                resFolderName = preferences.getDosijeiFolder().toFile().getName();
+                type = "dosijei";
+            } else {
+                folderItems = preferences.getSpecificForder(spec).toFile().listFiles();
+                resFolderName = preferences.getSpecificForder(spec).toFile().getName();
+                type = "mt";
             }
 
             for (File folderItem : folderItems) {
                 T1Item item = new T1Item(folderItem.getName(), folderItem,
-                        spec != -1 ? preferences.getSpecificForder(spec).toFile().getName() : preferences.getTicketsFolder().toFile().getName(),
-                        spec == -1 ? "ticket" : "mt");
+                        resFolderName,
+                        type);
                 if (!itemIsInResult(item)) {
                     list.add(item);
                 }
@@ -204,87 +249,46 @@ public class T1Controller implements Initializable {
         }
     }
 
-    //on row double click, add item to dosije list
     @FXML
     private void onTempTableRawClicked(MouseEvent evt) {
         TableView t = (TableView) evt.getSource();
         if (evt.getClickCount() == 2) {
-            T1Item clickedItem = (T1Item) t.getSelectionModel().getSelectedItem();
-
-            //set default unique file names for dosije file
-            if (sugestedMergeName.get() == null) {
-                sugestedMergeName.set("Dosije_" + System.currentTimeMillis() + ".pdf");
-            }
-
-            if (sugestedDosijeLocation.get() == null) {
-                try {
-                    sugestedDosijeLocation.set(getDosijeArcFolder(clickedItem).getPath());
-                } catch (IOException ex) {
-                    Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-            //update lower table which keeps files to be merged and archived
-            dosijeData.add(clickedItem);
-
-            if (t.getId().contains("O")) {
-                tempDataReceived.remove(clickedItem);
-            }
-            if (tempDataSent != null && t.getId().contains("I")) {
-                tempDataSent.remove(clickedItem);
-            }
-
-            if (t.getId().contains("tickets")) {
-                tempTickets.remove(clickedItem);
-                ticketDate = getTicketDate(clickedItem);
-            }
-
-            if (clickedItem.getResFolderName().contains("MT202I")
-                    || clickedItem.getResFolderName().contains("MT202O")
-                    || clickedItem.getResFolderName().contains("MT200I")
-                    || clickedItem.getResFolderName().contains("MT200O")
-                    || clickedItem.getResFolderName().contains("MT300I")
-                    || clickedItem.getResFolderName().contains("MT300O")
-                    || clickedItem.getResFolderName().contains("MT320I")
-                    || clickedItem.getResFolderName().contains("MT320O")) {
-                try {
-                    sugestedMergeName.set(clickedItem.getFileName().split("_")[2] + ".pdf");
-                } catch (ArrayIndexOutOfBoundsException exc) {
-                    AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Action aborted", "Can not determin name.", "Selected file is not renamed").show();
-                }
-            }
+            onAnyTableDoubleClick(t);
         }
 
         if (evt.getButton().equals(MouseButton.SECONDARY)) {
-            
+            onTempTableSecondaryButtonClicked(t, evt);
+        }
+    }
+
+    @FXML
+    private void onResultTableRawClicked(MouseEvent evt) {
+        if (evt.getClickCount() == 2) {
+            TableView t = (TableView) evt.getSource();
+            onAnyTableDoubleClick(t);
+
+        }
+        if (evt.getButton().equals(MouseButton.SECONDARY)) {
             ContextMenu menu = new ContextMenu();
-            MenuItem item = new MenuItem("Show text");
+            MenuItem item = new MenuItem("Remove from DOSIJE");
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
-                    String text = "";
-                    T1Item clickedItem = (T1Item) t.getSelectionModel().getSelectedItem();
+                    T1Item clickedItem = (T1Item) resultTable.getSelectionModel().getSelectedItem();
+                    resultData.remove(clickedItem);
+                    if (resultData.isEmpty()) {
+                        sugestedDosijeLocation.setValue(null);
+                        comboList.clear();
+                    }
                     try {
-                        text = new FileUtils().readPdf(clickedItem.getFile());
+                        dosije.removeItem(clickedItem);
                     } catch (IOException ex) {
                         Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
-                    Stage stage = new Stage();
-                    
-                    FXMLLoader loader = new FXMLLoader(T1Controller.class.getResource("/FXMLFiles/MtTextDisplay.fxml"));
-                    Scene newScene = null;
-                        try {
-                            newScene = new Scene(loader.load());
-                        } catch (IOException ex) {
-                            Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    
-                    MtTextDisplayController c = loader.getController();
-                    c.setText(text);
-                    stage.setScene(newScene);
-                    stage.show();
+                    comboList.remove(dosije.getFileNameFromItem(clickedItem));
+                    onTabSelectionChange(null);
                 }
+
             });
 
             menu.getItems().add(item);
@@ -292,77 +296,108 @@ public class T1Controller implements Initializable {
         }
     }
 
-    private File getDosijeArcFolder(T1Item clickedItem) throws IOException {
-        String year = null;
-        String month = null;
-        String date = null;
-        dosijeFolder = preferences.getDosijeiFolder().toFile();
+    private void onTempTableSecondaryButtonClicked(TableView t, MouseEvent evt) {
 
-        if (!dosijeFolder.exists()) { //must be set in settings
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Destination folder not found", "Action aborted", "Destination folder does not exist: " + dosijeFolder.getPath()).show();
-            return null;
-        }
+        ContextMenu menu = new ContextMenu();
+        MenuItem item = new MenuItem("Add to DOSIJE");
+        item.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                T1Item clickedItem = (T1Item) t.getSelectionModel().getSelectedItem();
+//                MTEntity mt = null;
+//                TicketEntity tic = null;
+                String fileName;
 
-        year = DateUtils.getYearFromTicket(getTicketDate(clickedItem));
-        if (year == null || year.equals("") || year.equals("NA")) {
-            year = DateUtils.getYearFromMt(fileUtils.readMt(clickedItem.getFile()).getValueDate());
-        }
-        if (year == null || year.equals("") || year.equals("NA")) {
-            year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-            AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Can not create year", "Action aborted", "File name is not correct: "
-                    + clickedItem.getFileName()
-                    + "\n" + "Year set to: " + year).show();
-        }
-        dosijeFolder = new File(dosijeFolder.getPath() + File.separator + year);
-//        if (!archiveFolder.exists()) {
-//            archiveFolder.mkdir();
-//        }
+                try {
+                    dosije.addItem(clickedItem);
+                    fileName = dosije.getFileNameFromItem(clickedItem);
 
-        month = DateUtils.getMonthFromTicket(getTicketDate(clickedItem));
-        if (month == null || month.equals("") || month.equals("NA")) {
-            month = DateUtils.getMonthFromMt(fileUtils.readMt(clickedItem.getFile()).getValueDate());
-        }
-        if (month == null || month.equals("") || month.equals("NA")) {
-            month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH + 1));
-            AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Can not create month", "Action aborted", "File name is not correct: "
-                    + clickedItem.getFileName()
-                    + "\n" + "Month set to: " + month).show();
-        }
+                    if (fileName != null) {
+                        comboList.add(fileName);
+                    }
 
-        dosijeFolder = new File(dosijeFolder.getPath() + File.separator + month);
-//        if (!archiveFolder.exists()) {
-//            archiveFolder.mkdir();
-//        }
+                } catch (IOException ex) {
+                    Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
-        date = getTicketDate(clickedItem);
-        if (date == null || date.equals("") || date.equals("NA")) {
-            date = fileUtils.readMt(clickedItem.getFile()).getValueDate();
-        }
-        if (date == null || date.equals("") || date.equals("NA")) {
-            date = DateUtils.getFormatedDate(System.currentTimeMillis());
-            AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Can not create date", "Action aborted", "File name is not correct: "
-                    + clickedItem.getFileName()
-                    + "\n" + "Date set to: " + date).show();
-        }
+                if (dosije.getSize() == 1) {
+                    dosije.setArchiveLocation(clickedItem);
+                    sugestedDosijeLocation.set(dosije.getArchiveLocation());
+                }
+                sugestedFileNameCombo.setValue(comboList.size() > 0 ? comboList.get(0) : "Dosije_" + System.currentTimeMillis() + ".pdf");
 
-        dosijeFolder = new File(dosijeFolder.getPath() + File.separator + date);
-//        if (!archiveFolder.exists()) {
-//            archiveFolder.mkdir();
-//        }
-        return dosijeFolder;
+                //update lower table which keeps files to be merged and archived
+                resultData.add(clickedItem);
+
+                if (t.getId().contains("O")) {
+                    tempDataReceived.remove(clickedItem);
+                }
+                if (tempDataSent != null && t.getId().contains("I")) {
+                    tempDataSent.remove(clickedItem);
+                }
+
+                if (t.getId().contains("tickets")) {
+                    tempTickets.remove(clickedItem);
+                    try {
+                        ticket = new TicketEntity(clickedItem.getFile());
+                    } catch (IOException ex) {
+                        Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                if (t.getId().contains("dosijei")) {
+                    tempDosijeData.remove(clickedItem);
+                }
+            }
+        });
+
+        menu.getItems().add(item);
+        menu.show(tabPane.getScene().getWindow(), evt.getScreenX(), evt.getScreenY());
     }
 
-    @FXML
-    private void onResultTableRawClicked(MouseEvent evt) {
-        if (evt.getClickCount() == 2) {
-            T1Item clickedItem = (T1Item) resultTable.getSelectionModel().getSelectedItem();
-            dosijeData.remove(clickedItem);
-            onTabSelectionChange(null);
+    private void onAnyTableDoubleClick(TableView t) {
+        String text = getMessageText(t);
+
+        if (text.equals("")) {
+            return;
         }
+        Stage stage = new Stage();
+
+        FXMLLoader loader = new FXMLLoader(T1Controller.class.getResource("/FXMLFiles/MtTextDisplay.fxml"));
+        Scene newScene = null;
+        try {
+            newScene = new Scene(loader.load());
+        } catch (IOException ex) {
+            Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MtTextDisplayController c = loader.getController();
+        c.setText(text);
+        stage.setScene(newScene);
+        stage.show();
+    }
+
+    private String getMessageText(TableView t) {
+        String text = "";
+        T1Item clickedItem = (T1Item) t.getSelectionModel().getSelectedItem();
+        if (clickedItem == null) {
+            return text;
+        }
+        try {
+            text = new FileUtils().readPdf(clickedItem.getFile());
+        } catch (IOException ex) {
+            Logger.getLogger(T1Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return text;
     }
 
     @FXML
     void onCreateClick() {
+        if (dosije.getSize() <= 0) {
+            AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Action aborted!", "Dosije is empty.", "You did not add any file to dosije.").show();
+            return;
+        }
+        
         notArchived = "";
         mergedName = "";
         mergeUtil = new PDFMergerUtility();
@@ -370,12 +405,11 @@ public class T1Controller implements Initializable {
         scene.setCursor(Cursor.WAIT);
         File destinFile = null;
 
-        mergedName = sugMergeLocTF.getText().trim() + File.separator + sugMergeNameTF.getText().trim();
+        mergedName = sugMergeLocTF.getText().trim() + File.separator + sugestedFileNameCombo.getSelectionModel().getSelectedItem().toString().trim();
         dosijeFolder = new File(sugMergeLocTF.getText().trim());
-//        mergedName = sugMergeLocTF.getText() + File.separator + sugMergeNameTF.getText();
 
         Optional<ButtonType> result = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?\n"
-                + getList(dosijeData)).showAndWait();
+                + getList(resultData)).showAndWait();
 
         if (result.get() == ButtonType.OK) {
             dosijeFolder.mkdirs();
@@ -388,7 +422,7 @@ public class T1Controller implements Initializable {
             destinFile = new File(mergedName);
             mergeUtil.setDestinationFileName(mergedName);
 
-            for (T1Item item : dosijeData) {
+            for (T1Item item : resultData) {
                 try {
                     mergeUtil.addSource(item.getFile());
                 } catch (FileNotFoundException ex) {
@@ -399,7 +433,7 @@ public class T1Controller implements Initializable {
             try {
                 mergeUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
                 if (destinFile.exists()) {
-                    archiveFiles(dosijeData);
+                    archiveFiles(resultData);
                 } else {
                     AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Merge not completed", "Action aborted", "Selected files not archived. Try again.").show();
                     resetDosijeLocAndName();
@@ -408,7 +442,7 @@ public class T1Controller implements Initializable {
 
                 Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Merge completed", "Merge completed", "Merge file saved on " + destinFile.getPath()
                         + "\n\n"
-                        + "Archived files: \n" + getList(dosijeData) + "\n"
+                        + "Archived files: \n" + getList(resultData) + "\n"
                         + (notArchived.isEmpty() ? "" : ("Please review. There are not archived files:\n" + notArchived)));
                 a.getButtonTypes().add(0, new ButtonType("Open file"));
                 Optional<ButtonType> o = a.showAndWait();
@@ -425,7 +459,7 @@ public class T1Controller implements Initializable {
             onTabSelectionChange(null);
         }
 
-        dosijeData.clear();
+        resultData.clear();
         scene.setCursor(Cursor.DEFAULT);
         resetDosijeLocAndName();
     }
@@ -449,7 +483,6 @@ public class T1Controller implements Initializable {
             archiveFolder = getArchiveFolder(t1Item);
 
             if (t1Item.getType().equals("mt")) {
-
                 try {
                     mt = fileUtils.readMt(t1Item.getFile());
 
@@ -462,22 +495,15 @@ public class T1Controller implements Initializable {
                 }
             }
             if (t1Item.getType().equals("ticket")) {
-                ticketDate = getTicketDate(t1Item);
+                ticketDate = ticket.getFormatedDate();
+                if (ticketDate == null) {
+                 AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Error!", "Ticket date = null", "Ticket date can not be null!").show();
+                 return;
+                }
+                
                 fileUtils.archiveMt(archiveFolder.getPath(), t1Item.getFile(), ticketDate);
             }
         }
-    }
-
-    private static String getTicketDate(T1Item t1Item) {
-        String ticketDate = "NA";
-        if (t1Item.getType().equals("ticket") && t1Item.getFileName().split("_").length > 2 && t1Item.getFileName().split("_")[3].length() > 10) {
-            System.out.println(t1Item.getFileName());
-            System.out.println(t1Item.getFileName().split("_")[3].substring(0, 10));
-            ticketDate = DateUtils.getFormatedDate(t1Item.getFileName().split("_")[3].substring(0, 10));
-        }
-        System.out.println(ticketDate);
-
-        return ticketDate;
     }
 
     private File getArchiveFolder(T1Item t1Item) {
@@ -521,20 +547,21 @@ public class T1Controller implements Initializable {
         tables.put("MT320I", MT320ITable);
 
         tables.put("tickets", ticketsTable);
+        tables.put("dosijei", dosijeiTable);
     }
 
     private void bindInfo() {
-        sugMergeNameTF.textProperty().bindBidirectional(sugestedMergeName);
+//        sugMergeNameTF.textProperty().bindBidirectional(sugestedMergeName);
         sugMergeLocTF.textProperty().bindBidirectional(sugestedDosijeLocation);
-
+//        sugestedFileNameCombo.
     }
 
     private boolean itemIsInResult(T1Item item) {
-        if (dosijeData == null) {
+        if (resultData == null) {
             return false;
         }
-        dosijeData = resultTable.getItems();
-        for (T1Item t : dosijeData) {
+        resultData = resultTable.getItems();
+        for (T1Item t : resultData) {
             if (t.getFile().equals(item.getFile()) && t.getFileName().equals(item.getFileName())) {
                 return true;
             }
@@ -543,11 +570,11 @@ public class T1Controller implements Initializable {
     }
 
     private void resetDosijeLocAndName() {
-        sugMergeNameTF.clear();
+        comboList.clear();
         sugMergeLocTF.clear();
-
         sugestedDosijeLocation.set(null);
-        sugestedMergeName.set(null);
+        dosije.clear();
+
     }
 
     /**
@@ -610,6 +637,23 @@ public class T1Controller implements Initializable {
             this.type = type;
         }
 
+        @Override
+        public String toString() {
+
+            System.out.println("File name: " + getFileName());
+            System.out.println("File: " + getFile());
+            System.out.println("Res folder name: " + getResFolderName());
+            System.out.println("Type: " + getType());
+
+            return super.toString();
+        }
+
+    }
+
+    private void addDatePickerValueChangeListener() {
+        datePicker.valueProperty().addListener((ObservableValue<? extends LocalDate> observable, LocalDate oldValue, LocalDate newValue) -> {
+            fillTable(-2, tempDosijeData);
+        });
     }
 
 }
