@@ -20,6 +20,13 @@
 }
 
 .bordered{
-    -fx-border-color: #5050C8;
-    
+    -fx-border-color: #5050C8;   
+}
+
+.ceterColumn{
+    -fx-alignment: center;
+}
+
+.rightColumn{
+    -fx-alignment: center-right
 }

@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import models.MTMessages.MTEntity;
+import models.TicketEntity2;
 
 /**
  *
@@ -105,5 +106,4 @@ public class DisplayDataModel {
     public void setTicketCount(int ticketCount) {
         this.ticketCount = ticketCount;
     }
-
 }

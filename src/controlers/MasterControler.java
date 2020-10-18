@@ -57,10 +57,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import models.MTMessages.MTDAO;
 import models.MTMessages.MTEntity;
-import org.apache.pdfbox.debugger.ui.RotationMenu;
+import models.TicketEntity;
+import models.TicketEntity2;
+import models.TicketTable;
 import preferences.PPIPreferences;
 import preferences.TBOPreferences;
 import utils.AlertUtils;
+import utils.DateUtils;
 import utils.FileUtils;
 
 public class MasterControler implements Initializable, ListChangeListener<MTEntity>, IOnFileReceived2, IOnResetWatcher {
@@ -76,10 +79,13 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private ObservableList<MTEntity> tableData;
     private FileUtils fileUtils;
     private Stage stage;
-    private final IOnFileReceived notificationControler = new NotificationController();
+    private final IOnFileReceived notificationControler = new NotificationTransitionController();
     private static DirectoryWatcher watcher;
     private static final SimpleIntegerProperty ticketsCount2 = new SimpleIntegerProperty();
     private RotateTransition rotateTransition;
+    private static TicketTable ticketsTable;
+    private static TableView<TicketEntity2> ticketsTableView;
+    public static boolean IS_TICKET_MODE;
 
     @FXML
     private DatePicker datePicker;
@@ -102,6 +108,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     @FXML
     private Label lastSelectionDisplay;
     @FXML
+    private VBox tableContainer;
+    @FXML
     private TableView table;
     @FXML
     private VBox scene;
@@ -115,10 +123,11 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private Button sendButton;
     @FXML
     private Label refreshLabel;
-    // </editor-fold>
 
+    // </editor-fold>
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        IS_TICKET_MODE = false;
         createDisplayObject();
         d.setNavLabels(getLabels());
         invalidateLiveMenu();
@@ -134,8 +143,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         setSettingsListener();
         OBSERVE_ON = preferences.getObserverStatus();
         rotateTransition = new RotateTransition(Duration.millis(2000), refreshLabel);
-        rotateTransition.setByAngle(360);
-
+        rotateTransition.setByAngle(360 * 7);
         if (OBSERVE_ON) {
             setDirectoryWatchers();
         }
@@ -337,6 +345,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
                     || currentSelectionLabel.getId().contains("MT299")
                     || currentSelectionLabel.getId().contains("MT999")));
         }
+        sendButton.setDisable(IS_TICKET_MODE);
+        renameButton.setDisable(IS_TICKET_MODE);
     }
 
     private void addDatePickerValueChangeListener() {
@@ -347,6 +357,13 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
             invalidateScene();
             invalidateOnSeparateThread(newValue);
             invalidateCount(newValue);
+            if (IS_TICKET_MODE) {
+                try {
+                    ticketsTable.setData(newValue);
+                } catch (IOException ex) {
+                    Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         });
     }
 
@@ -361,6 +378,8 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
 
     @FXML
     private void onNavMenuClicked(MouseEvent evt) {
+        IS_TICKET_MODE = false;
+        tableContainer.getChildren().set(0, table);
         if (previousSelectionLabel != null) {
             previousSelectionLabel.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.web(MODE.equals("PPI") ? "#5050C8" : "#512B58", 1d), new CornerRadii(0.8d), new Insets(0.8d))));
         }
@@ -471,10 +490,10 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
 
         //check how meny msgs. are selected
         if (selectedIndices.isEmpty()) {
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "No sellected message", "Action aborted!", "You must sellect at least one message").show();
+            AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "No sellected message", "Action aborted!", "You must sellect at least one message").show();
             return;
         }
-        Optional o = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "You are about to rename files ... ", "Action rename!", "Rename selected files? " + "(" + selectedIndices.size() + ")\nFolder: " + lastSelectionDisplay.getText()).showAndWait();
+        Optional o = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.CONFIRMATION, "You are about to rename files ... ", "Action rename!", "Rename selected files? " + "(" + selectedIndices.size() + ")\nFolder: " + lastSelectionDisplay.getText()).showAndWait();
         if (o.get().equals(ButtonType.OK)) {
 
         } else {
@@ -511,25 +530,31 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         scene.setCursor(Cursor.DEFAULT);
 
         //inform user about action completion
-        AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Files renamed.", "Action completed!", counter + " files renamed").show();
+        AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "Files renamed.", "Action completed!", counter + " files renamed").show();
         table.refresh();
     }
 
     @FXML
     private void onArchiveClick(MouseEvent evt) {
+        if (IS_TICKET_MODE) {
+            ticketsTable.onArchiveClick(getStage());
+            invalidateCount(datePicker.getValue());
+            return;
+        }
+
         ObservableList<Integer> selectedIndices = table.getSelectionModel().getSelectedIndices();
         d.setData(table.getItems());
 
         //check selection
         if (selectedIndices.isEmpty()) {
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "No sellected message", "Action aborted!", "You must sellect at least one message").show();
+            AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "No sellected message", "Action aborted!", "You must sellect at least one message").show();
             return;
         }
 
         //check if files are renamed
         for (Integer i : selectedIndices) {
             if (!d.getData().get(i).isRenamed()) {
-                AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Archive action stoped", "Action aborted!", "You can not archive messages that are not renamed.").show();
+                AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "Archive action stoped", "Action aborted!", "You can not archive messages that are not renamed.").show();
                 return;
             }
         }
@@ -566,7 +591,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         }
 
         //confirm dialog action
-        Optional o = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "You are about to archive files ... ", "Action archive!", "Archive selected files? " + "(" + selectedIndices.size() + ")\nFolder: " + lastSelectionDisplay.getText()).showAndWait();
+        Optional o = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.CONFIRMATION, "You are about to archive files ... ", "Action archive!", "Archive selected files? " + "(" + selectedIndices.size() + ")\nFolder: " + lastSelectionDisplay.getText()).showAndWait();
 
         if (!o.get().equals(ButtonType.OK)) {
             scene.setCursor(Cursor.DEFAULT);
@@ -583,13 +608,13 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
 
             if (isPension) {
                 String clientName = "";
-                Optional<String> result = AlertUtils.showInputDialog("Action pension archive!", "Client name:", "").showAndWait();
+                Optional<String> result = AlertUtils.showInputDialog(getStage(), "Action pension archive!", "Client name:", "").showAndWait();
                 if (result.isPresent()) {
                     clientName = result.get();
                 }
 
                 while (!result.isPresent()) {
-                    result = AlertUtils.showInputDialog("Action pension archive!", "Client name:", "").showAndWait();
+                    result = AlertUtils.showInputDialog(getStage(), "Action pension archive!", "Client name:", "").showAndWait();
                     if (result.get() == null) {
                         scene.setCursor(Cursor.DEFAULT);
                         return;
@@ -621,7 +646,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         for (int i = indecisToRemove.size() - 1; i > -1; i--) {
             d.getData().remove((int) indecisToRemove.get(i));
         }
-        AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "", "Action completed!", counter + " files archived.").show();
+        AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "", "Action completed!", counter + " files archived.").show();
         scene.setCursor(Cursor.DEFAULT);
         invalidateOnSeparateThread(LocalDate.now());
     }
@@ -634,13 +659,13 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
 
         //check selection
         if (selectedIndices.isEmpty()) {
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "No sellected message", "Action aborted!", "You must sellect at least one message").show();
+            AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "No sellected message", "Action aborted!", "You must sellect at least one message").show();
             return;
         }
 
         //check if destination folder is set
         if (preferences.getSendDir().toString().isEmpty()) {
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, id + " folder not defined!", "Action aborted!", id + " folder not set.\nGo to settings to define " + id + " folder.").show();
+            AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, id + " folder not defined!", "Action aborted!", id + " folder not set.\nGo to settings to define " + id + " folder.").show();
             scene.setCursor(Cursor.DEFAULT);
             return;
         }
@@ -648,13 +673,13 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         //check if dest. folder is accesible
         //TODO - not tested
         if (!preferences.getSendDir().toFile().canRead() && !preferences.getSendDir().toFile().canWrite()) {
-            AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, id + " \" access denied!", "Action aborted!", "You do not have permition to write to " + id + " folder.\n" + preferences.getSendDir().toString()).show();
+            AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, id + " \" access denied!", "Action aborted!", "You do not have permition to write to " + id + " folder.\n" + preferences.getSendDir().toString()).show();
             scene.setCursor(Cursor.DEFAULT);
             return;
         }
 
         //confirm sending action
-        Optional o = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "Sending files to  " + id, "Action Send!", "Send selected files to" + id + "? " + "(" + selectedIndices.size() + ")\nFolder: " + lastSelectionDisplay.getText()).showAndWait();
+        Optional o = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.CONFIRMATION, "Sending files to  " + id, "Action Send!", "Send selected files to" + id + "? " + "(" + selectedIndices.size() + ")\nFolder: " + lastSelectionDisplay.getText()).showAndWait();
         if (!o.get().equals(ButtonType.OK)) {
             scene.setCursor(Cursor.DEFAULT);
             return;
@@ -686,7 +711,7 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
         }
 
         //refresh table and labels
-        AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Send to " + id + " completed", id + " completed", counter + " files sent to " + id).show();
+        AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "Send to " + id + " completed", id + " completed", counter + " files sent to " + id).show();
 
         scene.setCursor(Cursor.DEFAULT);
         invalidateOnSeparateThread(LocalDate.now());
@@ -783,7 +808,35 @@ public class MasterControler implements Initializable, ListChangeListener<MTEnti
     private void onRefreshClick() {
         invalidateOnSeparateThread(LocalDate.now());
         invalidateCount(LocalDate.now());
+        if (IS_TICKET_MODE) {
+            try {
+                ticketsTable.setData(datePicker.getValue());
+            } catch (IOException ex) {
+                Logger.getLogger(MasterControler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         rotateTransition.play();
 
     }
+
+    private Stage getStage() {
+        if (scene == null) {
+            return null;
+        }
+        return (Stage) scene.getScene().getWindow();
+    }
+
+    @FXML
+    private void onTicketLableClick() throws IOException {
+        IS_TICKET_MODE = true;
+        if (ticketsTable == null) {
+            ticketsTable = new TicketTable();
+            ticketsTableView = ticketsTable.getTableView();
+        }
+
+        tableContainer.getChildren().set(0, ticketsTableView);
+        ticketsTable.setData(datePicker.getValue());
+        invalidateButtons();
+    }
+
 }

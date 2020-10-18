@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.VBox?>
+
+<TableView fx:id="ticketsTable" prefHeight="400.0" prefWidth="600.0" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <columns>
+        <TableColumn fx:id="ticketNumber" prefWidth="75.0" styleClass="ceterColumn" text="T.N.">
+            <cellValueFactory>
+                <PropertyValueFactory property="ticketNumber" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="dealType" prefWidth="75.0" styleClass="ceterColumn" text="Deal">
+            <cellValueFactory>
+                <PropertyValueFactory property="dealType" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="counterParty" prefWidth="75.0" text="Party">
+            <cellValueFactory>
+                <PropertyValueFactory property="counterParty" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="dealDetails" prefWidth="75.0" text="Details">
+            <cellValueFactory>
+                <PropertyValueFactory property="dealDetails" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="amount1" prefWidth="75.0" styleClass="rightColumn" text="Amount 1">
+            <cellValueFactory>
+                <PropertyValueFactory property="amount1" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="amount2" prefWidth="75.0" styleClass="rightColumn" text="Amount 2">
+            <cellValueFactory>
+                <PropertyValueFactory property="amount2" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="date1" prefWidth="75.0" styleClass="ceterColumn" text="Date 1">
+            <cellValueFactory>
+                <PropertyValueFactory property="date1" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="date2" prefWidth="75.0" styleClass="ceterColumn" text="Date 2">
+            <cellValueFactory>
+                <PropertyValueFactory property="date2" />
+            </cellValueFactory>
+        </TableColumn>
+    </columns>
+    <items>
+        <FXCollections fx:factory="observableArrayList">
+       
+        </FXCollections>
+    </items>
+    <columnResizePolicy>
+        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+    </columnResizePolicy> 
+</TableView>

@@ -1,6 +1,6 @@
 package Tools;
 
-import controlers.NotificationController;
+import controlers.NotificationTransitionController;
 import java.nio.file.Path;
 
 /**

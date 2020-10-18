@@ -17,7 +17,6 @@ import javafx.util.Duration;
  */
 public class NotificationModel {
 
-    private final FXMLLoader loader;
     private final Stage stage;
     private final Scene scene;
 
@@ -25,8 +24,6 @@ public class NotificationModel {
     private TranslateTransition slideOutTransition, slideInTransition, moveMoreDownTransition;
 
     public NotificationModel(FXMLLoader loader, Stage stage) throws IOException {
-        this.loader = loader;
-
         this.scene = new Scene(loader.load());
         this.scene.setFill(null);
 
@@ -68,7 +65,6 @@ public class NotificationModel {
             moveMoreDownTransition.setFromY(4);
             moveMoreDownTransition.setToY(300);
         }
-
     }
 
     void show() {
@@ -82,7 +78,6 @@ public class NotificationModel {
             @Override
             public void handle(ActionEvent event) {
                 stage.hide();
-
             }
         });
     }

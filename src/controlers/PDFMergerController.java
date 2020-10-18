@@ -77,7 +77,7 @@ public class PDFMergerController extends javafx.application.Application implemen
 
         PDFMergerUtility mergeUtil = new PDFMergerUtility();
 
-        Optional<ButtonType> result = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?").showAndWait();
+        Optional<ButtonType> result = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?").showAndWait();
 
         if (result.get() == ButtonType.OK) {
             mergeUtil.setDestinationFileName(System.getProperty("user.home") + "/Desktop/" + mergedName);
@@ -93,8 +93,8 @@ public class PDFMergerController extends javafx.application.Application implemen
 
             try {
                 mergeUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-                Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "Merge completed", "Merge completed", "Merge file saved on Desktop:\n" + mergedName);
-                a.getButtonTypes().setAll( new ButtonType("Open file"));
+                Alert a = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.CONFIRMATION, "Merge completed", "Merge completed", "Merge file saved on Desktop:\n" + mergedName);
+                a.getButtonTypes().setAll(new ButtonType("Open file"));
 
                 Optional<ButtonType> o = a.showAndWait();
                 if (o.get().equals(a.getButtonTypes().get(0))) {
@@ -102,7 +102,7 @@ public class PDFMergerController extends javafx.application.Application implemen
                 }
 
             } catch (IOException ex) {
-                AlertUtils.getSimpleAlert(Alert.AlertType.WARNING, "Merge not completed", "Action aborted", ex.getMessage()).show();
+                AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.WARNING, "Merge not completed", "Action aborted", ex.getMessage()).show();
                 Logger.getLogger(PDFMergerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -149,11 +149,15 @@ public class PDFMergerController extends javafx.application.Application implemen
         return mergedName;
     }
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-        
+
     }
-    
-    
+
+    private Stage getStage() {
+        if (scene == null) {
+            return null;
+        }
+        return (Stage) scene.getScene().getWindow();
+    }
 }

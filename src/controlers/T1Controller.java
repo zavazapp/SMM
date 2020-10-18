@@ -394,7 +394,7 @@ public class T1Controller implements Initializable {
     @FXML
     void onCreateClick() {
         if (dosije.getSize() <= 0) {
-            AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Action aborted!", "Dosije is empty.", "You did not add any file to dosije.").show();
+            AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.ERROR, "Action aborted!", "Dosije is empty.", "You did not add any file to dosije.").show();
             return;
         }
         
@@ -408,13 +408,13 @@ public class T1Controller implements Initializable {
         mergedName = sugMergeLocTF.getText().trim() + File.separator + sugestedFileNameCombo.getSelectionModel().getSelectedItem().toString().trim();
         dosijeFolder = new File(sugMergeLocTF.getText().trim());
 
-        Optional<ButtonType> result = AlertUtils.getSimpleAlert(Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?\n"
+        Optional<ButtonType> result = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.CONFIRMATION, "PDF Merger", "PDF merger", "Merge listed files?\n"
                 + getList(resultData)).showAndWait();
 
         if (result.get() == ButtonType.OK) {
             dosijeFolder.mkdirs();
             if (!dosijeFolder.exists()) {
-                AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Error!", "Folder creation failed", "Can not create DOSIJE folder: " + dosijeFolder
+                AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.ERROR, "Error!", "Folder creation failed", "Can not create DOSIJE folder: " + dosijeFolder
                         + "\nYou may not have access to folder: " + dosijeFolder);
                 return;
             }
@@ -435,12 +435,12 @@ public class T1Controller implements Initializable {
                 if (destinFile.exists()) {
                     archiveFiles(resultData);
                 } else {
-                    AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Merge not completed", "Action aborted", "Selected files not archived. Try again.").show();
+                    AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.ERROR, "Merge not completed", "Action aborted", "Selected files not archived. Try again.").show();
                     resetDosijeLocAndName();
                     return;
                 }
 
-                Alert a = AlertUtils.getSimpleAlert(Alert.AlertType.INFORMATION, "Merge completed", "Merge completed", "Merge file saved on " + destinFile.getPath()
+                Alert a = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.INFORMATION, "Merge completed", "Merge completed", "Merge file saved on " + destinFile.getPath()
                         + "\n\n"
                         + "Archived files: \n" + getList(resultData) + "\n"
                         + (notArchived.isEmpty() ? "" : ("Please review. There are not archived files:\n" + notArchived)));
@@ -452,7 +452,7 @@ public class T1Controller implements Initializable {
                 }
 
             } catch (IOException ex) {
-                AlertUtils.getSimpleAlert(Alert.AlertType.WARNING, "Merge not completed", "Action aborted", ex.getMessage()).show();
+                AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.WARNING, "Merge not completed", "Action aborted", ex.getMessage()).show();
                 Logger.getLogger(PDFMergerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
@@ -497,7 +497,7 @@ public class T1Controller implements Initializable {
             if (t1Item.getType().equals("ticket")) {
                 ticketDate = ticket.getFormatedDate();
                 if (ticketDate == null) {
-                 AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Error!", "Ticket date = null", "Ticket date can not be null!").show();
+                 AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.ERROR, "Error!", "Ticket date = null", "Ticket date can not be null!").show();
                  return;
                 }
                 
@@ -655,5 +655,10 @@ public class T1Controller implements Initializable {
             fillTable(-2, tempDosijeData);
         });
     }
-
+    private Stage getStage(){
+        if (rootPane == null) {
+            return null;
+        }
+        return (Stage)rootPane.getScene().getWindow();
+    }
 }

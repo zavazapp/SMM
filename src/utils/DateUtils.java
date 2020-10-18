@@ -18,6 +18,11 @@ import java.util.logging.Logger;
  */
 public class DateUtils {
 
+    /**
+     * for tickets:
+     * ddMMMyyyy + ticket
+     * @return - dd.MM.yy
+     */
     public static String getFormatedDate(String unformated) {
         String formatedDate = unformated;
 
@@ -39,7 +44,7 @@ public class DateUtils {
 
     public static String getFormatedDate(LocalDate value) {
         Calendar c = Calendar.getInstance();
-        c.set(value.getYear(), value.getMonthValue()-1, value.getDayOfMonth());
+        c.set(value.getYear(), value.getMonthValue() - 1, value.getDayOfMonth());
         return getFormatedDate(c.getTimeInMillis());
     }
 
@@ -97,7 +102,7 @@ public class DateUtils {
 
         try {
             Date date = inputFormat.parse(unformated);
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yy",Locale.ENGLISH);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yy", Locale.ENGLISH);
 
             temp = outputFormat.format(date);
 
@@ -156,6 +161,11 @@ public class DateUtils {
         return today.equals(userChoice);
     }
 
+    /**
+     * 
+     * @param date - dd.MM.yy
+     * @return 
+     */
     public static String getYearFromTicket(String date) {
         if (date == null || date.equals("") || date.equals("NA")) {
             return "NA";

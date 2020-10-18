@@ -65,7 +65,7 @@ public class LoginController implements Initializable {
 
         NAME = utils.StringUtils.getNameFromUser(email);
         setMode(null);
-        
+
     }
 
     /**
@@ -104,9 +104,9 @@ public class LoginController implements Initializable {
         } else {
 
             if (alert == null) {
-                alert = AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Login error!", "Wrong password!", "Try again.");
+                alert = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.ERROR, "Login error!", "Wrong password!", "Try again.");
             }
-            
+
             alert.showAndWait();
             passField.setText("");
             passField.requestFocus();
@@ -116,7 +116,7 @@ public class LoginController implements Initializable {
     public void onKeyPressed(KeyEvent evt) throws IOException {
         if (evt.getCode().equals(KeyCode.ENTER)) {
             if (alert == null) {
-                alert = AlertUtils.getSimpleAlert(Alert.AlertType.ERROR, "Login error!", "Wrong password!", "Try again.");
+                alert = AlertUtils.getSimpleAlert(getStage(), Alert.AlertType.ERROR, "Login error!", "Wrong password!", "Try again.");
             }
 
             if (!alert.isShowing()) {
@@ -145,5 +145,12 @@ public class LoginController implements Initializable {
                 stage.centerOnScreen();
             });
         }
+    }
+
+    private Stage getStage() {
+        if (rightHalfPane == null) {
+            return null;
+        }
+        return (Stage) rightHalfPane.getScene().getWindow();
     }
 }

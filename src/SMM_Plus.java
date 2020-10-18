@@ -26,7 +26,6 @@ public class SMM_Plus extends Application {
         Scene scene = new Scene(root);
 //        scene.setFill(null);
         stage.setScene(scene);
-        
         //set taskbar icon
         stage.getIcons().add(new Image(this.getClass().getResourceAsStream("resources/taskbar_icon.png")));
         stage.show();

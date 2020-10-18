@@ -29,7 +29,7 @@ import utils.FileUtils;
  *
  * @author Miodrag Spasic
  */
-public class NotificationController implements Initializable, IOnFileReceived {
+public class NotificationTransitionController implements Initializable, IOnFileReceived {
 
     private static ObservableList<MTEntity> data;
     private final FileUtils fileUtils = new FileUtils();
@@ -57,11 +57,11 @@ public class NotificationController implements Initializable, IOnFileReceived {
             if (mtNotification == null) {
                 try {
                     mtNotification = new NotificationModel(
-                            new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/Notification.fxml")),
+                            new FXMLLoader(NotificationTransitionController.class.getResource("/FXMLFiles/Notification.fxml")),
                             new Stage(StageStyle.TRANSPARENT)
                     );
                 } catch (IOException ex) {
-                    Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NotificationTransitionController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             if (!mtNotification.isShowing()) {
@@ -74,17 +74,17 @@ public class NotificationController implements Initializable, IOnFileReceived {
             try {
                 setData(root, filePath);
             } catch (IOException ex) {
-                Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NotificationTransitionController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             if (ticketNotification == null) {
                 try {
                     ticketNotification = new NotificationModel(
-                            new FXMLLoader(NotificationController.class.getResource("/FXMLFiles/TicketNotification.fxml")),
+                            new FXMLLoader(NotificationTransitionController.class.getResource("/FXMLFiles/TicketNotification.fxml")),
                             new Stage(StageStyle.TRANSPARENT)
                     );
                 } catch (IOException ex) {
-                    Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NotificationTransitionController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             if (!ticketNotification.isShowing()) {

@@ -108,13 +108,16 @@
                         </Label>
                   <HBox alignment="CENTER_LEFT" layoutY="25.0" prefHeight="32.0" prefWidth="156.0">
                      <children>
-                        <Label text="Tickets:" textFill="WHITE">
+                        <Label id="ticketId" onMouseClicked="#onTicketLableClick" styleClass="navLabel" text="Tickets:" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <padding>
                               <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
                         </Label>
                         <Label fx:id="ticketsCount" alignment="CENTER" text="0" textAlignment="CENTER" textFill="WHITE">
                            <font>
@@ -434,7 +437,7 @@
                   </AnchorPane>
                     </children>
                 </VBox>
-                <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                <VBox fx:id="tableContainer" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                     <HBox.margin>
                         <Insets left="4.0" right="4.0" />
                     </HBox.margin>
