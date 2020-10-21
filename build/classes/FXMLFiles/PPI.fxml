@@ -381,7 +381,7 @@
                         </AnchorPane>
                     </children>
                 </VBox>
-                <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+                <VBox fx:id="tableContainer" alignment="CENTER" layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
                     <HBox.margin>
                         <Insets left="4.0" right="4.0" />
                     </HBox.margin>
